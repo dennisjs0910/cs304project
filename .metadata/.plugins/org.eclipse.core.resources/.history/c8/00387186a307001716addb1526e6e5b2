@@ -1,0 +1,24 @@
+package query;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class QueryFacade
+{
+	private Connection conn;
+	private boolean isAdmin;
+	
+	public QueryFacade(boolean isAdmin)
+	{
+		this.isAdmin = isAdmin;
+		this.conn = null;
+	}
+	
+	public void connect() throws SQLException
+	{
+		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+		conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1522:ug", "ora_v4e9", "a33356130");
+	}
+	
+}

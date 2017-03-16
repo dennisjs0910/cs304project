@@ -1,0 +1,24 @@
+import java.sql.SQLException;
+
+import query.QueryFacade;
+
+public class testQuery {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		try
+		{
+			QueryFacade q = new QueryFacade(false);
+			q.connect();
+			System.out.println("Connection successful");
+			q.getSelectionQuery("001");
+		}
+		catch (SQLException e)
+		{
+			System.out.println("Connection Failed");
+			e.printStackTrace();
+		}
+	}
+
+}

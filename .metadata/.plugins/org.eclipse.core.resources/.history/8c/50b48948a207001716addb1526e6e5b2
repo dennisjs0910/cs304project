@@ -1,0 +1,10 @@
+package query;
+
+public class SelectionRow
+{
+	String lid;
+	String courtid;
+	String sin;
+	String level;
+
+}
