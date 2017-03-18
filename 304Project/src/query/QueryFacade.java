@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import row.AggregationLessonAvgAgeRow;
+import row.AggregationLessonCountRow;
 import row.DivisionCoachRow;
 import row.DivisionCourtRow;
 import row.LessonReportRow;
@@ -89,7 +91,7 @@ public class QueryFacade
 	// Division query: courts
 	public List<DivisionCourtRow> getDivisionCourts() throws SQLException
 	{
-		String query = "SELECT c.cid, c.name "
+		String query = "SELECT DISTINCT c.cid, c.name "
 				+ "FROM Customer c, Reserve r, ReservableCourt rc "
 				+ "WHERE c.cid = r.cid AND r.courtid = rc.courtid "
 				+ "AND NOT EXISTS ((Select rc2.courtid FROM ReservableCourt rc2) MINUS (SELECT r2.courtid FROM Reserve r2 WHERE r2.cid = c.cid))";
@@ -135,4 +137,52 @@ public class QueryFacade
 	}
 	
 	//Aggregation: Find number of students registered in each lesson. (count)
+	public List<AggregationLessonCountRow> getAggregationLessonCount() throws SQLException
+	{
+		String query = "SELECT count(*), l.lid, l.l_level "
+				+ "FROM Lesson l, Enrolled_In e "
+				+ "WHERE l.lid = e.lid "
+				+ "GROUP BY l.lid, l.l_level";
+
+		List<AggregationLessonCountRow> rows = new ArrayList<AggregationLessonCountRow>();
+		
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			int numStudents = rs.getInt(1);
+			String lid = rs.getString(2);
+			String level = rs.getString(3);
+			
+			AggregationLessonCountRow row = new AggregationLessonCountRow(numStudents, lid, level);
+			rows.add(row);
+		}
+		s.close();
+		return rows;
+	}
+	
+	// Aggregation: Find the average age of students registered in each lesson.
+	public List<AggregationLessonAvgAgeRow> getAggregationAvgAgeLesson() throws SQLException
+	{
+		String query = "SELECT avg(c.age), l.lid, l.l_level "
+				+ "FROM Lesson l, Enrolled_In e, Customer c "
+				+ "WHERE l.lid = e.lid AND e.cid = c.cid "
+				+ "GROUP BY l.lid, l.l_level";
+
+		List<AggregationLessonAvgAgeRow> rows = new ArrayList<AggregationLessonAvgAgeRow>();
+		
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			int avgAge = rs.getInt(1);
+			String lid = rs.getString(2);
+			String level = rs.getString(3);
+			
+			AggregationLessonAvgAgeRow row = new AggregationLessonAvgAgeRow(avgAge, lid, level);
+			rows.add(row);
+		}
+		s.close();
+		return rows;
+	}
 }
