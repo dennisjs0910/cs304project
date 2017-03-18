@@ -21,11 +21,13 @@ public class MainFrame extends JFrame implements ActionListener{
     
     private String userType;
     private String userName;
+    private String userPassword;
+    private AuthenticateUser auth;
     
 
     public MainFrame(){
+    	auth = new AuthenticateUser();
         createHomeFrame();
-
     }
 
     @Override
@@ -154,12 +156,9 @@ public class MainFrame extends JFrame implements ActionListener{
         mainFrame.add(controlPanel);
         mainFrame.add(statusLabel);
         headerLabel.setText("Tennis Court Manager");
-        mainFrame.setVisible(true);
-        JButton customerButton = new JButton("Customer");
-        JButton employeeButton = new JButton("Employee");
-        controlPanel.add(customerButton);
-        controlPanel.add(employeeButton);
         
+       
+        //add radio button and set listeners to distinguish type of user
         //disables the ability to select multiple radio buttons
         ButtonGroup radioGroup = new ButtonGroup();
         JRadioButton custButton = new JRadioButton("Customer");
@@ -167,27 +166,28 @@ public class MainFrame extends JFrame implements ActionListener{
         JRadioButton adminButton = new JRadioButton("Admin");
         adminButton.setName("admin");
         radioGroup.add(custButton);
-        radioGroup.add(adminButton);
-        
+        radioGroup.add(adminButton);   
         controlPanel.add(custButton);
         controlPanel.add(adminButton);
-        customerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                produceCustomerFrame();
-
-            }
-        });
-
-        employeeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                produceEmployeeFrame();
-            }
-        });
         
         custButton.addActionListener(saveUserType);
         adminButton.addActionListener(saveUserType);
+        
+        //Text field to authenticate user   
+        JTextField nameText = new JTextField("user name",10);
+        JTextField passwordText = new JTextField("password",10);
+        JButton login = new JButton("login");
+        
+        nameText.addActionListener(saveUserName);
+//        passwordText.addActionListener(l);
+        
+        controlPanel.add(nameText);
+        controlPanel.add(passwordText);
+        controlPanel.add(login);
+        nameText.addActionListener(saveUserName);
+        passwordText.addActionListener(savePassword);
+        login.addActionListener(auth);
+        mainFrame.setVisible(true);
     }
     
     ActionListener saveUserType = new ActionListener(){
@@ -197,9 +197,31 @@ public class MainFrame extends JFrame implements ActionListener{
     		String name = o.getName();
     		if (name.equals("customer")){
     			System.out.println(name);
+    			produceCustomerFrame();
     		} else {
     			System.out.println("I'm powerful");
+    			produceEmployeeFrame();
     		}
+        }
+    };
+    
+    ActionListener saveUserName = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		System.out.println("I have been hit");
+    		JTextField o = (JTextField)e.getSource();
+    		String name = o.getText();
+    		auth.setName(name);
+        }
+    };
+    
+    ActionListener savePassword = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		System.out.println("I have been hit");
+    		JTextField o = (JTextField)e.getSource();
+    		String password = o.getText();
+    		auth.setPassword(password);
         }
     };
 
@@ -230,7 +252,7 @@ public class MainFrame extends JFrame implements ActionListener{
         elSubFrame.add(elControlPanel);
         elSubFrame.setVisible(true);
 
-        // add listeners to textfields and combobox and constantly each field?
+        // add listeners to text fields and combo box and constantly each field?
         levelComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -262,7 +284,27 @@ public class MainFrame extends JFrame implements ActionListener{
     }
     
     
-
+    private class AuthenticateUser implements ActionListener {
+    	private String name;
+    	private String pass;
+    	
+    	public AuthenticateUser(){
+    		 
+    	}
+    	
+    	public void setName(String userName){
+    		name = userName;
+    	}
+    	public void setPassword(String password){
+    		pass = password;
+    	}
+    	
+    	@Override
+    	public void actionPerformed(ActionEvent e) {
+            System.out.println(name);
+            System.out.println(pass);
+        }
+    }
 
 
 }
