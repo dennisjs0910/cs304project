@@ -18,6 +18,10 @@ public class MainFrame extends JFrame implements ActionListener{
     private JLabel statusLabel;
     private JPanel controlPanel;
     private JLabel msglabel;
+    
+    private String userType;
+    private String userName;
+    
 
     public MainFrame(){
         createHomeFrame();
@@ -155,7 +159,18 @@ public class MainFrame extends JFrame implements ActionListener{
         JButton employeeButton = new JButton("Employee");
         controlPanel.add(customerButton);
         controlPanel.add(employeeButton);
-
+        
+        //disables the ability to select multiple radio buttons
+        ButtonGroup radioGroup = new ButtonGroup();
+        JRadioButton custButton = new JRadioButton("Customer");
+        custButton.setName("customer");
+        JRadioButton adminButton = new JRadioButton("Admin");
+        adminButton.setName("admin");
+        radioGroup.add(custButton);
+        radioGroup.add(adminButton);
+        
+        controlPanel.add(custButton);
+        controlPanel.add(adminButton);
         customerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -170,7 +185,23 @@ public class MainFrame extends JFrame implements ActionListener{
                 produceEmployeeFrame();
             }
         });
+        
+        custButton.addActionListener(saveUserType);
+        adminButton.addActionListener(saveUserType);
     }
+    
+    ActionListener saveUserType = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		JRadioButton o = (JRadioButton)e.getSource();
+    		String name = o.getName();
+    		if (name.equals("customer")){
+    			System.out.println(name);
+    		} else {
+    			System.out.println("I'm powerful");
+    		}
+        }
+    };
 
     private void bookTennisCourtSubFrame(){
         JFrame btcSubFrame = createSubFrame();
@@ -229,6 +260,8 @@ public class MainFrame extends JFrame implements ActionListener{
 //        frame.setVisible(true);
         return frame;
     }
+    
+    
 
 
 
