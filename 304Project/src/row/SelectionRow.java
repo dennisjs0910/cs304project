@@ -1,4 +1,4 @@
-package query;
+package row;
 
 public class SelectionRow
 {

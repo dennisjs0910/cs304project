@@ -2,7 +2,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import query.QueryFacade;
-import query.SelectionRow;
+import row.SelectionRow;
 
 public class testQuery {
 
