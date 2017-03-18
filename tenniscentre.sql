@@ -23,6 +23,7 @@ CCNumber CHAR(16),
 Phone CHAR(10),
 Name CHAR(20),
 Address CHAR(50),
+Age INTEGER,
 PRIMARY KEY(CID));
 
 grant select on Customer to public;
@@ -109,11 +110,11 @@ insert into TennisCentre values ('003','123 Dennis St., Coquitlam BC');
 insert into TennisCentre values ('004','234 Lucas Ave., Burnaby BC');
 insert into TennisCentre values ('005','345 Katharine Blvd., Surrey BC');
 
-insert into Customer values ('123456','1234567890123456','6048221111','Jon Snow','111 W 16th Ave, Vancouver BC');
-insert into Customer values ('121234','1234567123213213','6048232133','Tyrian Lannister','41 Wesbrook Mall, Vancouver BC');
-insert into Customer values ('121237','1234123123123213','6048223123','Cersei Lannister','123 Westeros Lane, Vancouver BC');
-insert into Customer values ('121244','1234523124214212','6048221434','Rob Stark','441 Red Wedding Lane, Vancouver BC');
-insert into Customer values ('121247','1234567890232312','6048221567','Ned Stark','4466 W 14th Ave, Vancouver BC');
+insert into Customer values ('123456','1234567890123456','6048221111','Jon Snow','111 W 16th Ave, Vancouver BC', 22);
+insert into Customer values ('121234','1234567123213213','6048232133','Tyrian Lannister','41 Wesbrook Mall, Vancouver BC', 28);
+insert into Customer values ('121237','1234123123123213','6048223123','Cersei Lannister','123 Westeros Lane, Vancouver BC', 35);
+insert into Customer values ('121244','1234523124214212','6048221434','Rob Stark','441 Red Wedding Lane, Vancouver BC', 19);
+insert into Customer values ('121247','1234567890232312','6048221567','Ned Stark','4466 W 14th Ave, Vancouver BC', 48);
 
 insert into EmployeesWorkAt values ('101010101','6046667777','Maria Sharapova','21 Jump St., Burnaby BC','001');
 insert into EmployeesWorkAt values ('202020202','7789322387','Andre Agassi','123 Fake St., Richmond BC','001');
