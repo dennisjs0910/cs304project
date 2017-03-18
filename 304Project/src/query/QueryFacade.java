@@ -12,11 +12,23 @@ public class QueryFacade
 {
 	private Connection conn;
 	private boolean isAdmin;
+	private String username;
 	
-	public QueryFacade(boolean isAdmin)
+	public QueryFacade(boolean isAdmin, String username)
 	{
 		this.isAdmin = isAdmin;
+		this.username = username;
 		this.conn = null;
+	}
+	
+	public boolean getIsAdmin()
+	{
+		return this.isAdmin;
+	}
+	
+	public String getUsername()
+	{
+		return this.username;
 	}
 	
 	public void connect() throws SQLException
