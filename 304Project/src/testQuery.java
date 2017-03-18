@@ -11,7 +11,7 @@ public class testQuery {
 
 		try
 		{
-			QueryFacade q = new QueryFacade(false);
+			QueryFacade q = new QueryFacade(false, "");
 			q.connect();
 			System.out.println("Connection successful");
 			List<SelectionRow> result = q.getSelectionQuery("001");

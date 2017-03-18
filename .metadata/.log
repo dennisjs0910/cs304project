@@ -83,3 +83,22 @@ Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.
 
 !ENTRY org.apache.ivyde.eclipse 1 0 2017-03-12 17:08:45.293
 !MESSAGE IvyDE plugin started
+!SESSION 2017-03-17 22:56:50.532 -----------------------------------------------
+eclipse.buildId=4.6.2.M20161124-1400
+java.version=1.8.0_66
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_CA
+Framework arguments:  -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product -keyring /Users/dennisjsyi/.eclipse_keyring
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.java.product -data /Users/dennisjsyi/Desktop/cpsc304/cs304project -product org.eclipse.epp.package.java.product -keyring /Users/dennisjsyi/.eclipse_keyring
+
+!ENTRY org.eclipse.core.net 1 0 2017-03-17 22:56:53.721
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY org.eclipse.e4.ui.workbench 2 0 2017-03-17 22:57:02.221
+!MESSAGE Removing part descriptor with the 'org.apache.ivyde.eclipse.ui.views.ReportView' id and the 'Ivy Report' description. Points to the invalid 'bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView' class.
+
+!ENTRY org.eclipse.e4.ui.workbench 2 0 2017-03-17 22:57:02.225
+!MESSAGE Removing part descriptor with the 'org.apache.ivyde.eclipse.ui.views.ReverseDependencyExplorer' id and the 'Reverse Dependency Explorer' description. Points to the invalid 'bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView' class.
+
+!ENTRY org.eclipse.e4.ui.workbench 2 0 2017-03-17 22:57:02.226
+!MESSAGE Removing part descriptor with the 'org.apache.ivyde.eclipse.resolvevisualizer.ResolveVisualizerView' id and the 'Ivy Resolve Visualizer' description. Points to the invalid 'bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView' class.
