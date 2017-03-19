@@ -3,12 +3,12 @@ package row;
 public class LessonReportRow {
 	
 	private String LID;
-	private String CourtID;
+	private int CourtID;
 	private String Level;
 	private String CoachName;
 	private String CentreID;
 	
-	public LessonReportRow(String lid, String courtid, String level, String coachname, String centreid)
+	public LessonReportRow(String lid, int courtid, String level, String coachname, String centreid)
 	{
 		LID = lid;
 		CourtID = courtid;
@@ -22,7 +22,7 @@ public class LessonReportRow {
 		return LID;
 	}
 	
-	public String getCourtID()
+	public int getCourtID()
 	{
 		return CourtID;
 	}

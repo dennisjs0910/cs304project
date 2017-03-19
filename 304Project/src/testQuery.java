@@ -20,7 +20,9 @@ public class testQuery {
 			//List<SelectionRow> result = q.getSelectionQuery("001");
 			//List<AggregationLessonCountRow> result = q.getAggregationLessonCount();
 			//List<AggregationLessonAvgAgeRow> result = q.getAggregationAvgAgeLesson();
-			List<NestedAggregationRow> result = q.getNestedAggregation();
+			//List<NestedAggregationRow> result = q.getNestedAggregation();
+			//boolean result = q.deleteEmployee("202020202");
+			boolean result = q.deleteReservation("123456", 7);
 			System.out.println("Selection query successful");
 			System.out.println(result);
 		}

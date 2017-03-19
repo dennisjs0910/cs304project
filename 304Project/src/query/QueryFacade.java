@@ -54,7 +54,7 @@ public class QueryFacade
 		while (rs.next())
 		{
 			String lid = rs.getString("lid");
-			String courtid = rs.getString("courtid");
+			int courtid = rs.getInt("courtid");
 			String sin = rs.getString("sin");
 			String level = rs.getString("l_level");
 			SelectionRow selectionRow = new SelectionRow(lid, courtid, sin, level);
@@ -78,7 +78,7 @@ public class QueryFacade
 		while (rs.next())
 		{
 			String lid = rs.getString(1);
-			String CourtID = rs.getString(2);
+			int CourtID = rs.getInt(2);
 			String Level = rs.getString(3);
 			String CoachName = rs.getString(4);
 			String CentreID = rs.getString(5);
@@ -212,5 +212,134 @@ public class QueryFacade
 		}
 		s.close();
 		return rows;
+	}
+	
+	/*
+	 * Deletes an employee with the associated sin.
+	 * Return true if delete was successful; if there was no record to delete that
+	 * matched the specified sin, return false.
+	 */
+	public boolean deleteEmployee(String sin) throws SQLException
+	{
+		String query = "DELETE FROM EmployeesWorkAt e "
+				+ "WHERE e.sin = " + sin;
+		
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	/*
+	 * Deletes a reservation for the given cid and courtid.
+	 * Returns true if the delete was successful. Returns false if no row matched
+	 * the given info.
+	 */
+	public boolean deleteReservation(String cid, int courtid) throws SQLException
+	{
+		String query = "DELETE FROM Reserve r "
+				+ "WHERE r.cid = " + cid + " AND r.courtid = " + courtid;
+		
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	/*
+	 * Update the name of the customer with the given cid. Returns
+	 * true if successful. Returns false if no customer with cid exists.
+	 */
+	public boolean updateCustomerName(String cid, String name) throws SQLException
+	{
+		String query = "UPDATE Customer "
+				+ "SET Name = " + name
+				+ " WHERE cid = " + cid;
+		
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	/*
+	 * Update the phone of the customer with the given cid. Returns
+	 * true if successful. Returns false if no customer with cid exists.
+	 */
+	public boolean updateCustomerPhone(String cid, String phone) throws SQLException
+	{
+		String query = "UPDATE Customer "
+				+ "SET Phone = " + phone
+				+ " WHERE cid = " + cid;
+		
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	/*
+	 * Update the address of the customer with the given cid. Returns
+	 * true if successful. Returns false if no customer with cid exists.
+	 */
+	public boolean updateCustomerAddress(String cid, String address) throws SQLException
+	{
+		String query = "UPDATE Customer "
+				+ "SET Address = " + address
+				+ " WHERE cid = " + cid;
+		
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	/*
+	 * Update the age of the customer with the given cid. Returns
+	 * true if successful. Returns false if no customer with cid exists.
+	 * 
+	 * Exception thrown if the value of age violates the check constraint
+	 * (age is not between 0 and 120).
+	 */
+	public boolean updateCustomerAge(String cid, int age) throws SQLException
+	{
+		String query = "UPDATE Customer "
+				+ "SET Age = " + age
+				+ " WHERE cid = " + cid;
+		
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+
+		return true;
 	}
 }

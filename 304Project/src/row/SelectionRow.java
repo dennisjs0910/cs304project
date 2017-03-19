@@ -3,11 +3,11 @@ package row;
 public class SelectionRow
 {
 	String lid;
-	String courtid;
+	int courtid;
 	String sin;
 	String level;
 	
-	public SelectionRow(String lid, String courtid, String sin, String level)
+	public SelectionRow(String lid, int courtid, String sin, String level)
 	{
 		this.lid = lid;
 		this.courtid = courtid;
@@ -20,7 +20,7 @@ public class SelectionRow
 		return this.lid;
 	}
 	
-	public String getCourtID()
+	public int getCourtID()
 	{
 		return this.courtid;
 	}
