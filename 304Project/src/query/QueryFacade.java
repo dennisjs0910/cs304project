@@ -13,6 +13,7 @@ import row.AggregationLessonCountRow;
 import row.DivisionCoachRow;
 import row.DivisionCourtRow;
 import row.LessonReportRow;
+import row.NestedAggregationRow;
 import row.SelectionRow;
 
 public class QueryFacade
@@ -180,6 +181,32 @@ public class QueryFacade
 			String level = rs.getString(3);
 			
 			AggregationLessonAvgAgeRow row = new AggregationLessonAvgAgeRow(avgAge, lid, level);
+			rows.add(row);
+		}
+		s.close();
+		return rows;
+	}
+	
+	// Nested aggregation: Find the customer(s) with the max number of court reservations of any customer
+	public List<NestedAggregationRow> getNestedAggregation() throws SQLException
+	{
+		String query = "SELECT c.cid, c.name, count(*)"
+				+ "FROM Reserve r, Customer c "
+				+ "WHERE r.cid = c.cid "
+				+ "GROUP BY c.cid, c.name "
+				+ "HAVING COUNT(*) >= ALL (SELECT Count(*) FROM Reserve r2, Customer c2 WHERE r2.cid = c2.cid AND c.cid != c2.cid GROUP BY c2.cid, c.name)";
+
+		List<NestedAggregationRow> rows = new ArrayList<NestedAggregationRow>();
+		
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			String cid = rs.getString(1);
+			String cname = rs.getString(2);
+			int numReservations = rs.getInt(3);
+			
+			NestedAggregationRow row = new NestedAggregationRow(cid, cname, numReservations);
 			rows.add(row);
 		}
 		s.close();

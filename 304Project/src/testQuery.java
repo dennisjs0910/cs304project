@@ -4,6 +4,7 @@ import java.util.List;
 import query.QueryFacade;
 import row.AggregationLessonAvgAgeRow;
 import row.AggregationLessonCountRow;
+import row.NestedAggregationRow;
 import row.SelectionRow;
 
 public class testQuery {
@@ -18,7 +19,8 @@ public class testQuery {
 			System.out.println("Connection successful");
 			//List<SelectionRow> result = q.getSelectionQuery("001");
 			//List<AggregationLessonCountRow> result = q.getAggregationLessonCount();
-			List<AggregationLessonAvgAgeRow> result = q.getAggregationAvgAgeLesson();
+			//List<AggregationLessonAvgAgeRow> result = q.getAggregationAvgAgeLesson();
+			List<NestedAggregationRow> result = q.getNestedAggregation();
 			System.out.println("Selection query successful");
 			System.out.println(result);
 		}
