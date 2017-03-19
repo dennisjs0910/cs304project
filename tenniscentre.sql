@@ -24,7 +24,9 @@ Phone CHAR(10),
 Name CHAR(20),
 Address CHAR(50),
 Age INTEGER,
-PRIMARY KEY(CID));
+PRIMARY KEY(CID),
+CONSTRAINT check_customer_age
+CHECK (Age BETWEEN 0 and 120));
 
 grant select on Customer to public;
 
@@ -90,7 +92,7 @@ SIN CHAR(9),
 L_Level CHAR(3),
 PRIMARY KEY (LID),
 FOREIGN KEY (CourtID) REFERENCES TennisCourt,
-FOREIGN KEY (SIN) REFERENCES Coach);
+FOREIGN KEY (SIN) REFERENCES Coach ON DELETE SET NULL);
 
 grant select on Lesson to public;
 
