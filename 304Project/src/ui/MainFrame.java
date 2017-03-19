@@ -18,10 +18,16 @@ public class MainFrame extends JFrame implements ActionListener{
     private JLabel statusLabel;
     private JPanel controlPanel;
     private JLabel msglabel;
+    
+    private String userType;
+    private String userName;
+    private String userPassword;
+    private AuthenticateUser auth;
+    
 
     public MainFrame(){
+    	auth = new AuthenticateUser();
         createHomeFrame();
-
     }
 
     @Override
@@ -150,27 +156,74 @@ public class MainFrame extends JFrame implements ActionListener{
         mainFrame.add(controlPanel);
         mainFrame.add(statusLabel);
         headerLabel.setText("Tennis Court Manager");
+        
+       
+        //add radio button and set listeners to distinguish type of user
+        //disables the ability to select multiple radio buttons
+        ButtonGroup radioGroup = new ButtonGroup();
+        JRadioButton custButton = new JRadioButton("Customer");
+        custButton.setName("customer");
+        JRadioButton adminButton = new JRadioButton("Admin");
+        adminButton.setName("admin");
+        radioGroup.add(custButton);
+        radioGroup.add(adminButton);   
+        controlPanel.add(custButton);
+        controlPanel.add(adminButton);
+        
+        custButton.addActionListener(saveUserType);
+        adminButton.addActionListener(saveUserType);
+        
+        //Text field to authenticate user   
+        JTextField nameText = new JTextField("user name",10);
+        JTextField passwordText = new JTextField("password",10);
+        JButton login = new JButton("login");
+        
+        nameText.addActionListener(saveUserName);
+//        passwordText.addActionListener(l);
+        
+        controlPanel.add(nameText);
+        controlPanel.add(passwordText);
+        controlPanel.add(login);
+        nameText.addActionListener(saveUserName);
+        passwordText.addActionListener(savePassword);
+        login.addActionListener(auth);
         mainFrame.setVisible(true);
-        JButton customerButton = new JButton("Customer");
-        JButton employeeButton = new JButton("Employee");
-        controlPanel.add(customerButton);
-        controlPanel.add(employeeButton);
-
-        customerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                produceCustomerFrame();
-
-            }
-        });
-
-        employeeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                produceEmployeeFrame();
-            }
-        });
     }
+    
+    ActionListener saveUserType = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		JRadioButton o = (JRadioButton)e.getSource();
+    		String name = o.getName();
+    		if (name.equals("customer")){
+    			System.out.println(name);
+    			produceCustomerFrame();
+    		} else {
+    			System.out.println("I'm powerful");
+    			produceEmployeeFrame();
+    		}
+        }
+    };
+    
+    ActionListener saveUserName = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		System.out.println("I have been hit");
+    		JTextField o = (JTextField)e.getSource();
+    		String name = o.getText();
+    		auth.setName(name);
+        }
+    };
+    
+    ActionListener savePassword = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		System.out.println("I have been hit");
+    		JTextField o = (JTextField)e.getSource();
+    		String password = o.getText();
+    		auth.setPassword(password);
+        }
+    };
 
     private void bookTennisCourtSubFrame(){
         JFrame btcSubFrame = createSubFrame();
@@ -199,7 +252,7 @@ public class MainFrame extends JFrame implements ActionListener{
         elSubFrame.add(elControlPanel);
         elSubFrame.setVisible(true);
 
-        // add listeners to textfields and combobox and constantly each field?
+        // add listeners to text fields and combo box and constantly each field?
         levelComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -229,7 +282,29 @@ public class MainFrame extends JFrame implements ActionListener{
 //        frame.setVisible(true);
         return frame;
     }
-
+    
+    
+    private class AuthenticateUser implements ActionListener {
+    	private String name;
+    	private String pass;
+    	
+    	public AuthenticateUser(){
+    		 
+    	}
+    	
+    	public void setName(String userName){
+    		name = userName;
+    	}
+    	public void setPassword(String password){
+    		pass = password;
+    	}
+    	
+    	@Override
+    	public void actionPerformed(ActionEvent e) {
+            System.out.println(name);
+            System.out.println(pass);
+        }
+    }
 
 
 }

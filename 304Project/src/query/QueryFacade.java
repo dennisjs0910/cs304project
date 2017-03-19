@@ -28,6 +28,7 @@ public class QueryFacade
 		this.username = username;
 		this.conn = null;
 	}
+
 	
 	public boolean getIsAdmin()
 	{
