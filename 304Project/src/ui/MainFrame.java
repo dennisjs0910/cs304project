@@ -23,6 +23,7 @@ public class MainFrame extends JFrame implements ActionListener{
     private String userName;
     private String userPassword;
     private AuthenticateUser auth;
+    private int EmployeeID;
     
 
     public MainFrame(){
@@ -34,13 +35,13 @@ public class MainFrame extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
 
     }
-
-    public void produceCustomerFrame() {
-        mainFrame.setVisible(false);
-//        mainFrame.dispose();
+    
+    public void newFrame() {
+    	mainFrame.setVisible(false);
         mainFrame = new JFrame();
         mainFrame.setSize(WIDTH,HEIGHT);
         mainFrame.setLayout(new GridLayout(3, 1));
+
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowAdapter windowEvent){
                 System.exit(0);
@@ -50,13 +51,17 @@ public class MainFrame extends JFrame implements ActionListener{
         headerLabel = new JLabel("", JLabel.CENTER);
         statusLabel = new JLabel("",JLabel.CENTER);
         statusLabel.setSize(350,100);
-        headerLabel.setText("Welcome Customer!");
         controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
         mainFrame.add(headerLabel);
         mainFrame.add(controlPanel);
         mainFrame.add(statusLabel);
         mainFrame.setVisible(true);
+    }
+
+    public void produceCustomerFrame() {
+        newFrame();
+        headerLabel.setText("Welcome Customer!");
         JButton searchBookTennisCourt = new JButton("Tennis Court Reservation");
         JButton searchEnrollLesson = new JButton("Tennis Court Lessons");
         JButton updatePersonalInfo = new JButton("Update your personal information");
@@ -100,28 +105,57 @@ public class MainFrame extends JFrame implements ActionListener{
     }
 
     public void produceEmployeeFrame(){
-        mainFrame.setVisible(false);
-        mainFrame = new JFrame();
-        mainFrame.setSize(WIDTH,HEIGHT);
-        mainFrame.setLayout(new GridLayout(3, 1));
-
-        mainFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowAdapter windowEvent){
-                System.exit(0);
-            }
+        newFrame();
+        headerLabel.setText("Welcome Employee" + EmployeeID);
+        //Button for updateEmployee Frame
+        JButton updateEmployeeInfoButton = new JButton("Update Personal Info");
+        controlPanel.add(updateEmployeeInfoButton);
+        updateEmployeeInfoButton.addActionListener(new ActionListener(){
+        	@Override
+        	public void actionPerformed(ActionEvent e){
+        		createUpdateEmployeeFrame();
+        	}
         });
-
-        headerLabel = new JLabel("", JLabel.CENTER);
-        statusLabel = new JLabel("",JLabel.CENTER);
-        statusLabel.setSize(350,100);
-//        msglabel = new JLabel("", JLabel.CENTER);
-        headerLabel.setText("Welcome Employee!");
-        controlPanel = new JPanel();
-        controlPanel.setLayout(new FlowLayout());
-        mainFrame.add(headerLabel);
-        mainFrame.add(controlPanel);
-        mainFrame.add(statusLabel);
-        mainFrame.setVisible(true);
+      //Button for update lessons Frame
+        JButton employeeLessonsButton = new JButton("Add Lessons");
+        controlPanel.add(employeeLessonsButton);
+        employeeLessonsButton.addActionListener(new ActionListener(){
+        	@Override
+        	public void actionPerformed(ActionEvent e){
+        		createEmployeeLessonsFrame();
+        	}
+        });
+      //Button for update courts Frame
+        JButton employeecourtsButton = new JButton("Add Courts");
+        controlPanel.add(employeecourtsButton);
+        employeecourtsButton.addActionListener(new ActionListener(){
+        	@Override
+        	public void actionPerformed(ActionEvent e){
+        		createEmployeeCourtsFrame();
+        	}
+        });
+        
+      //Button for search employees Frame
+        JButton searchEmployeeButton = new JButton("Search Employees");
+        controlPanel.add(searchEmployeeButton);
+        searchEmployeeButton.addActionListener(new ActionListener(){
+        	@Override
+        	public void actionPerformed(ActionEvent e){
+        		createEmployeeSearchFrame();
+        	}
+        });
+        
+      //Button for search customers Frame
+        JButton searchCustomersButton = new JButton("Search Customers");
+        controlPanel.add(searchCustomersButton);
+        searchCustomersButton.addActionListener(new ActionListener(){
+        	@Override
+        	public void actionPerformed(ActionEvent e){
+        		createCustomerSearchFrame();
+        	}
+        });
+        
+        //back button 
         JButton goBack = new JButton("back");
         controlPanel.add(goBack);
         goBack.addActionListener(new ActionListener() {
@@ -131,6 +165,87 @@ public class MainFrame extends JFrame implements ActionListener{
             }
         });
     }
+    //Frame for updating employee personal info
+    private void createUpdateEmployeeFrame(){
+    	newFrame();
+    	headerLabel.setText("Update Employee" + EmployeeID);
+    	//back button 
+        JButton goBack = new JButton("back");
+        controlPanel.add(goBack);
+        goBack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	produceEmployeeFrame();
+            }
+        });
+    }
+    // Frame for employees to update lesson information
+    private void createEmployeeLessonsFrame() {
+    	newFrame();
+    	headerLabel.setText("Update Lessons");
+    	//back button 
+        JButton goBack = new JButton("back");
+        controlPanel.add(goBack);
+        goBack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	produceEmployeeFrame();
+            }
+        });
+    }
+    // Frame for employees to update court information
+    private void createEmployeeCourtsFrame() {
+    	newFrame();
+    	headerLabel.setText("Update Courts");
+    	//back button 
+        JButton goBack = new JButton("back");
+        controlPanel.add(goBack);
+        goBack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	produceEmployeeFrame();
+            }
+        });
+    }
+    // Frame for employees to search employees
+    private void createEmployeeSearchFrame() {
+    	newFrame();
+    	headerLabel.setText("Search Employees");
+    	//back button 
+        JButton goBack = new JButton("back");
+        controlPanel.add(goBack);
+        goBack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	produceEmployeeFrame();
+            }
+        });
+    }
+    // Frame for employees to search for customers
+    // Employees can access customer information, reservations, and lessons from this frame
+    private void createCustomerSearchFrame() {
+    	newFrame();
+    	headerLabel.setText("Search Customers");
+    	//Button for updateCustomer Frame
+        JButton updateCusotmerInfoButton = new JButton("Update Customer Info");
+        controlPanel.add(updateCusotmerInfoButton);
+        updateCusotmerInfoButton.addActionListener(new ActionListener(){
+        	@Override
+        	public void actionPerformed(ActionEvent e){
+        		custUpdateSubFrame();
+        	}
+        });
+      //back button 
+        JButton goBack = new JButton("back");
+        controlPanel.add(goBack);
+        goBack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	produceEmployeeFrame();
+            }
+        });
+    }
+    
 
     private void createHomeFrame(){
         if (mainFrame != null){
@@ -140,13 +255,11 @@ public class MainFrame extends JFrame implements ActionListener{
         mainFrame = new JFrame();
         mainFrame.setSize(WIDTH,HEIGHT);
         mainFrame.setLayout(new GridLayout(3, 1));
-
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowAdapter windowEvent){
                 System.exit(0);
             }
         });
-
         headerLabel = new JLabel("", JLabel.CENTER);
         statusLabel = new JLabel("",JLabel.CENTER);
         statusLabel.setSize(350,100);
@@ -157,7 +270,6 @@ public class MainFrame extends JFrame implements ActionListener{
         mainFrame.add(statusLabel);
         headerLabel.setText("Tennis Court Manager");
         
-       
         //add radio button and set listeners to distinguish type of user
         //disables the ability to select multiple radio buttons
         ButtonGroup radioGroup = new ButtonGroup();
@@ -305,6 +417,4 @@ public class MainFrame extends JFrame implements ActionListener{
             System.out.println(pass);
         }
     }
-
-
 }
