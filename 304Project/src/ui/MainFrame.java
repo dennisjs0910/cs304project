@@ -391,7 +391,23 @@ public class MainFrame extends JFrame implements ActionListener{
     }
 
     private void custUpdateSubFrame(){
-
+    	JFrame frame = createSubFrame();
+    	JPanel updateControlPanel = new JPanel();
+    	updateControlPanel.setLayout(new BoxLayout(updateControlPanel, BoxLayout.PAGE_AXIS));
+    	JLabel updateLabel = new JLabel("Update your information "+ customer.getName());
+    	JTextField nameText = new JTextField(customer.getName(),20);
+        JTextField ccnumber = new JTextField(customer.getCcnumber(),20);
+        JTextField phone = new JTextField(customer.getPhone(),20);
+        JTextField address = new JTextField(customer.getAddress(),20);
+        JTextField age = new JTextField(customer.getAge(),20);
+        frame.add(updateLabel);
+        updateControlPanel.add(nameText);
+        updateControlPanel.add(ccnumber);
+        updateControlPanel.add(phone);
+        updateControlPanel.add(address);
+        updateControlPanel.add(age);
+        frame.add(updateControlPanel);
+        frame.setVisible(true);
     }
 
     private JFrame createSubFrame(){

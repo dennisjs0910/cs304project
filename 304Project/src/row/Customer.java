@@ -16,7 +16,23 @@ public class Customer {
 		this.address = address.trim();
 		this.age = age;
 	}
-
+	public String getCcnumber(){
+		return ccnumber;
+	}
+	
+	public String getPhone(){
+		return phone;
+	}
+	
+	public String getAddress(){
+		return address;
+	}
+	
+	public String getAge(){
+		
+		return Integer.toString(age);
+	}
+	
 	public String getName(){
 		return name;
 	}
