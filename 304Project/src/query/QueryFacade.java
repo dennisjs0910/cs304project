@@ -10,6 +10,7 @@ import java.util.List;
 
 import row.AggregationLessonAvgAgeRow;
 import row.AggregationLessonCountRow;
+import row.Customer;
 import row.DivisionCoachRow;
 import row.DivisionCourtRow;
 import row.LessonReportRow;
@@ -342,4 +343,32 @@ public class QueryFacade
 
 		return true;
 	}
+	
+	public Customer getCustomer(String custid) throws SQLException {
+		String query = "SELECT * "
+				+ "FROM Customer c "
+				+ "WHERE c.cid = " + custid;
+				
+		
+		System.out.println(query);			
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		
+		Customer cus = null;
+		
+		while (rs.next())
+		{
+			String cid = rs.getString(1);
+			String ccnumber = rs.getString(2);
+			String phone = rs.getString(3);
+			String cname = rs.getString(4);
+			String address = rs.getString(5);
+			int age = Integer.parseInt(rs.getString(6));
+			cus = new Customer(cid,ccnumber,phone,cname,address,age);
+		}
+		s.close();
+		
+		return cus;
+	}
+	
 }

@@ -1,11 +1,19 @@
 package ui;
 
+
 import javax.swing.*;
+
+import query.QueryFacade;
+import row.Customer;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * Created by dennisjsyi on 2017-03-16.
@@ -24,11 +32,14 @@ public class MainFrame extends JFrame implements ActionListener{
     private String userPassword;
     private AuthenticateUser auth;
     private int EmployeeID;
-    
+    private Customer customer;
+    private QueryFacade q;
+    private Connection conn;
 
     public MainFrame(){
     	auth = new AuthenticateUser();
         createHomeFrame();
+		
     }
 
     @Override
@@ -61,7 +72,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
     public void produceCustomerFrame() {
         newFrame();
-        headerLabel.setText("Welcome Customer!");
+        headerLabel.setText("Welcome " + customer.getName());
         JButton searchBookTennisCourt = new JButton("Tennis Court Reservation");
         JButton searchEnrollLesson = new JButton("Tennis Court Lessons");
         JButton updatePersonalInfo = new JButton("Update your personal information");
@@ -308,11 +319,13 @@ public class MainFrame extends JFrame implements ActionListener{
     		JRadioButton o = (JRadioButton)e.getSource();
     		String name = o.getName();
     		if (name.equals("customer")){
+    			userType = "customer";
     			System.out.println(name);
-    			produceCustomerFrame();
+    			//produceCustomerFrame();
     		} else {
+    			userType = "admin";
     			System.out.println("I'm powerful");
-    			produceEmployeeFrame();
+//    			produceEmployeeFrame();
     		}
         }
     };
@@ -391,7 +404,6 @@ public class MainFrame extends JFrame implements ActionListener{
                 frame.dispose();
             }
         });
-//        frame.setVisible(true);
         return frame;
     }
     
@@ -413,8 +425,25 @@ public class MainFrame extends JFrame implements ActionListener{
     	
     	@Override
     	public void actionPerformed(ActionEvent e) {
+    		QueryFacade q = null;
             System.out.println(name);
             System.out.println(pass);
+    		if (userType.equals("customer")){
+    			q = new QueryFacade(false, name);
+    		} else {
+    			q = new QueryFacade(true, name);
+    		}
+    		try {
+    			q.connect();
+    			System.out.println("connection!");
+    			if (userType.equals("customer")){
+    				customer = q.getCustomer(name);
+    				produceCustomerFrame();
+        		}
+    		} catch(Exception err){ 
+    			System.out.println("shit");
+    		}
+			
         }
     }
 }

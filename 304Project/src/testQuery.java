@@ -4,6 +4,7 @@ import java.util.List;
 import query.QueryFacade;
 import row.AggregationLessonAvgAgeRow;
 import row.AggregationLessonCountRow;
+import row.Customer;
 import row.NestedAggregationRow;
 import row.SelectionRow;
 
@@ -14,7 +15,7 @@ public class testQuery {
 
 		try
 		{
-			QueryFacade q = new QueryFacade(false, "");
+			QueryFacade q = new QueryFacade(false, "123456");
 			q.connect();
 			System.out.println("Connection successful");
 			//List<SelectionRow> result = q.getSelectionQuery("001");
@@ -22,7 +23,8 @@ public class testQuery {
 			//List<AggregationLessonAvgAgeRow> result = q.getAggregationAvgAgeLesson();
 			//List<NestedAggregationRow> result = q.getNestedAggregation();
 			//boolean result = q.deleteEmployee("202020202");
-			boolean result = q.deleteReservation("123456", 7);
+//			boolean result = q.deleteReservation("123456", 7);
+			Customer result = q.getCustomer("123456");
 			System.out.println("Selection query successful");
 			System.out.println(result);
 		}
