@@ -264,8 +264,8 @@ public class QueryFacade
 	public boolean updateCustomerName(String cid, String name) throws SQLException
 	{
 		String query = "UPDATE Customer "
-				+ "SET Name = " + name
-				+ " WHERE cid = " + cid;
+				+ "SET Name = '" + name
+				+ "' WHERE cid = " + cid;
 		
 		Statement s = conn.createStatement();
 		int rowsChanged = s.executeUpdate(query);
@@ -285,8 +285,8 @@ public class QueryFacade
 	public boolean updateCustomerPhone(String cid, String phone) throws SQLException
 	{
 		String query = "UPDATE Customer "
-				+ "SET Phone = " + phone
-				+ " WHERE cid = " + cid;
+				+ "SET Phone = '" + phone
+				+ "' WHERE cid = " + cid;
 		
 		Statement s = conn.createStatement();
 		int rowsChanged = s.executeUpdate(query);
@@ -306,7 +306,7 @@ public class QueryFacade
 	public boolean updateCustomerAddress(String cid, String address) throws SQLException
 	{
 		String query = "UPDATE Customer "
-				+ "SET Address = " + address
+				+ "SET Address = '" + address
 				+ " WHERE cid = " + cid;
 		
 		Statement s = conn.createStatement();
@@ -331,7 +331,7 @@ public class QueryFacade
 	{
 		String query = "UPDATE Customer "
 				+ "SET Age = " + age
-				+ " WHERE cid = " + cid;
+				+ "' WHERE cid = " + cid;
 		
 		Statement s = conn.createStatement();
 		int rowsChanged = s.executeUpdate(query);
@@ -347,10 +347,7 @@ public class QueryFacade
 	public Customer getCustomer(String custid) throws SQLException {
 		String query = "SELECT * "
 				+ "FROM Customer c "
-				+ "WHERE c.cid = " + custid;
-				
-		
-		System.out.println(query);			
+				+ "WHERE c.cid = " + custid;	
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
 		

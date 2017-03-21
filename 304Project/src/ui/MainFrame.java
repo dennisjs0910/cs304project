@@ -39,6 +39,13 @@ public class MainFrame extends JFrame implements ActionListener{
     public MainFrame(){
     	auth = new AuthenticateUser();
         createHomeFrame();
+    	q = new QueryFacade(false, "");
+    	try {
+			q.connect();
+			System.out.println("connection!");
+		} catch(Exception err){ 
+			System.out.println("no connection turn on your server");
+		}
 		
     }
 
@@ -333,7 +340,6 @@ public class MainFrame extends JFrame implements ActionListener{
     ActionListener saveUserName = new ActionListener(){
     	@Override
         public void actionPerformed(ActionEvent e) {
-    		System.out.println("I have been hit");
     		JTextField o = (JTextField)e.getSource();
     		String name = o.getText();
     		auth.setName(name);
@@ -391,24 +397,113 @@ public class MainFrame extends JFrame implements ActionListener{
     }
 
     private void custUpdateSubFrame(){
-    	JFrame frame = createSubFrame();
+    	final JFrame frame = createSubFrame();
     	JPanel updateControlPanel = new JPanel();
     	updateControlPanel.setLayout(new BoxLayout(updateControlPanel, BoxLayout.PAGE_AXIS));
     	JLabel updateLabel = new JLabel("Update your information "+ customer.getName());
+    	// Text fields for all customer fields
     	JTextField nameText = new JTextField(customer.getName(),20);
         JTextField ccnumber = new JTextField(customer.getCcnumber(),20);
         JTextField phone = new JTextField(customer.getPhone(),20);
         JTextField address = new JTextField(customer.getAddress(),20);
         JTextField age = new JTextField(customer.getAge(),20);
+        JButton finishUpdateButton = new JButton("finish");
+        // adding listeners to each text fields
+        nameText.addActionListener(updateCustName);
+        phone.addActionListener(updateCustPhone);
+        address.addActionListener(updateCustAddress);
+        age.addActionListener(updateCustAge);
+        
+        // adding text fields into control panel and then into update frame
         frame.add(updateLabel);
         updateControlPanel.add(nameText);
         updateControlPanel.add(ccnumber);
         updateControlPanel.add(phone);
         updateControlPanel.add(address);
         updateControlPanel.add(age);
+        updateControlPanel.add(finishUpdateButton);
         frame.add(updateControlPanel);
         frame.setVisible(true);
+        finishUpdateButton.addActionListener(new ActionListener(){
+        	@Override
+            public void actionPerformed(ActionEvent e) {
+        		try{
+        		customer = q.getCustomer(customer.getCid());
+        		}catch(Exception err){
+        			System.out.println("Error while updating");
+        			err.printStackTrace();
+        		}
+        		produceCustomerFrame();
+        		frame.setVisible(false);
+        		frame.dispose();
+        	}
+        });
     }
+    
+    
+    
+    ActionListener updateCustName = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		JTextField o = (JTextField)e.getSource();
+    		String custName = o.getText();
+    		try{
+    			if(q == null) {
+    				System.out.println("sometihng is wrong");
+    			}
+    			System.out.println(custName);
+    			System.out.println(customer.getCid());
+    			q.updateCustomerName(customer.getCid(), custName);
+    		}catch(Exception err){
+    			System.out.println("something went wrong while updating customer name");
+    			err.printStackTrace();
+    		}
+    		
+        }
+    };
+    
+    ActionListener updateCustPhone = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		JTextField o = (JTextField)e.getSource();
+    		String custPhone = o.getText();
+    		try{
+    			q.updateCustomerPhone(customer.getCid(), custPhone);
+    		}catch(Exception err){
+    			System.out.println("something went wrong while updating customer phone");
+    			err.printStackTrace();
+    		}
+    		
+        }
+    };
+    
+    ActionListener updateCustAddress = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		JTextField o = (JTextField)e.getSource();
+    		String custAddress = o.getText();
+    		try{
+    			q.updateCustomerAddress(customer.getCid(), custAddress);
+    		}catch(Exception err){
+    			System.out.println("something went wrong while updating customer address");
+    			err.printStackTrace();
+    		}	
+        }
+    };
+    
+    ActionListener updateCustAge = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		JTextField o = (JTextField)e.getSource();
+    		String age = o.getText();
+    		try{
+    			q.updateCustomerAge(customer.getCid(), Integer.parseInt(age));
+    		}catch(Exception err){
+    			System.out.println("something went wrong while updating customer age");
+    			err.printStackTrace();
+    		}	
+        }
+    };
 
     private JFrame createSubFrame(){
         final JFrame frame = new JFrame();
@@ -425,7 +520,7 @@ public class MainFrame extends JFrame implements ActionListener{
     
     
     private class AuthenticateUser implements ActionListener {
-    	private String name;
+    	private String id;
     	private String pass;
     	
     	public AuthenticateUser(){
@@ -433,7 +528,7 @@ public class MainFrame extends JFrame implements ActionListener{
     	}
     	
     	public void setName(String userName){
-    		name = userName;
+    		id = userName;
     	}
     	public void setPassword(String password){
     		pass = password;
@@ -441,25 +536,23 @@ public class MainFrame extends JFrame implements ActionListener{
     	
     	@Override
     	public void actionPerformed(ActionEvent e) {
-    		QueryFacade q = null;
-            System.out.println(name);
+            System.out.println(id);
             System.out.println(pass);
-    		if (userType.equals("customer")){
-    			q = new QueryFacade(false, name);
-    		} else {
-    			q = new QueryFacade(true, name);
-    		}
-    		try {
-    			q.connect();
-    			System.out.println("connection!");
-    			if (userType.equals("customer")){
-    				customer = q.getCustomer(name);
-    				produceCustomerFrame();
-        		}
-    		} catch(Exception err){ 
-    			System.out.println("shit");
-    		}
-			
+//    		if (userType.equals("customer")){
+//    			q = new QueryFacade(false, id);
+//    		} else {
+//    			q = new QueryFacade(true, id);
+//    		}
+    		
+			try {
+				if (userType.equals("customer")){
+					customer = q.getCustomer(id);
+					produceCustomerFrame();
+	    		}
+			} catch (SQLException e1) {
+				System.out.println("Something went wrong while loading customer");
+				e1.printStackTrace();
+			}
         }
     }
 }

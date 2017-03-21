@@ -29,7 +29,6 @@ public class Customer {
 	}
 	
 	public String getAge(){
-		
 		return Integer.toString(age);
 	}
 	
