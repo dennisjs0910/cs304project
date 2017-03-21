@@ -5,6 +5,7 @@ import javax.swing.*;
 
 import query.QueryFacade;
 import row.Customer;
+import row.LessonReportRow;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,6 +15,7 @@ import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Created by dennisjsyi on 2017-03-16.
@@ -382,7 +384,26 @@ public class MainFrame extends JFrame implements ActionListener{
         elControlPanel.add(levelComboBox);
         elSubFrame.add(elControlPanel);
         elSubFrame.setVisible(true);
-
+        
+        try {
+			List<LessonReportRow> lrrs = q.generateReport();
+			String[] columnNames = {"lid", "Level", "Coach Name", "CentreID"};
+			JPanel lessonPanel = new JPanel();
+			lessonPanel.setLayout(new BoxLayout(lessonPanel, BoxLayout.PAGE_AXIS));
+			Object[][] data = new Object[lrrs.size()][4];
+			int i = 0;
+			for(LessonReportRow lrr: lrrs){
+	        	String[] info = {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			JTable lessonTable = new JTable(data, columnNames);
+			elSubFrame.add(lessonTable);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			System.out.println("Something went wrong while generatingReport");
+			e1.printStackTrace();
+		}
         // add listeners to text fields and combo box and constantly each field?
         levelComboBox.addActionListener(new ActionListener() {
             @Override
@@ -392,6 +413,7 @@ public class MainFrame extends JFrame implements ActionListener{
                 System.out.println(level);
             }
         });
+        
 
 
     }
