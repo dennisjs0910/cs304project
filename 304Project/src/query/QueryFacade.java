@@ -13,6 +13,7 @@ import row.AggregationLessonCountRow;
 import row.Customer;
 import row.DivisionCoachRow;
 import row.DivisionCourtRow;
+import row.Employee;
 import row.LessonReportRow;
 import row.NestedAggregationRow;
 import row.SelectionRow;
@@ -366,6 +367,31 @@ public class QueryFacade
 		s.close();
 		
 		return cus;
+	}
+	
+	public Employee getAdmin(String adminSin) throws SQLException {
+		String query = "SELECT * "
+				+ "FROM EmployeesWorkAt e "
+				+ "WHERE e.sin = " + adminSin;	
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		
+		Employee admin = null;
+		
+		while (rs.next())
+		{
+			
+			String sin = rs.getString(1);
+			String phone = rs.getString(2);
+			String name = rs.getString(3);
+			String address = rs.getString(4);
+			String centreID = rs.getString(5);
+			
+			admin = new Employee(sin, phone, name, address ,centreID);
+		}
+		s.close();
+		
+		return admin;
 	}
 	
 }

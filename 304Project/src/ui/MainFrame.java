@@ -5,6 +5,7 @@ import javax.swing.*;
 
 import query.QueryFacade;
 import row.Customer;
+import row.Employee;
 import row.LessonReportRow;
 
 import java.awt.*;
@@ -35,6 +36,7 @@ public class MainFrame extends JFrame implements ActionListener{
     private AuthenticateUser auth;
     private int EmployeeID;
     private Customer customer;
+    private Employee admin;
     private QueryFacade q;
     private Connection conn;
 
@@ -570,6 +572,9 @@ public class MainFrame extends JFrame implements ActionListener{
 				if (userType.equals("customer")){
 					customer = q.getCustomer(id);
 					produceCustomerFrame();
+	    		} else if (userType.equals("admin")){
+	    			admin = q.getAdmin(id);
+	    			produceEmployeeFrame();
 	    		}
 			} catch (SQLException e1) {
 				System.out.println("Something went wrong while loading customer");
