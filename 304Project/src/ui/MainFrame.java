@@ -2,12 +2,15 @@ package ui;
 
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import query.QueryFacade;
 import row.Coach;
 import row.Customer;
 import row.Employee;
 import row.LessonReportRow;
+import row.ReservableTennisCourt;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -40,6 +43,9 @@ public class MainFrame extends JFrame implements ActionListener{
     private Employee admin;
     private QueryFacade q;
     private Connection conn;
+    
+    private String lessonId;
+    private String reserveCourtId;
 
     public MainFrame(){
     	q = new QueryFacade(false, "");
@@ -84,6 +90,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
     public void produceCustomerFrame() {
         newFrame();
+        System.out.println(customer);
         headerLabel.setText("Welcome " + customer.getName());
         JButton searchBookTennisCourt = new JButton("Tennis Court Reservation");
         JButton searchEnrollLesson = new JButton("Tennis Court Lessons");
@@ -440,23 +447,52 @@ public class MainFrame extends JFrame implements ActionListener{
         }
     };
 
+    //Customer book tennis court sub frame.
     private void bookTennisCourtSubFrame(){
         JFrame btcSubFrame = createSubFrame();
         JPanel btcControlPanel = new JPanel();
         btcControlPanel.setLayout(new FlowLayout());
         JLabel header = new JLabel("Search and Reserve a Tennis Court");
-
-        btcControlPanel.add(header);
-
+        btcControlPanel.add(header);       
         btcSubFrame.add(btcControlPanel);
-        btcSubFrame.setVisible(true);
         // here we would render all reservations grouped by the day
-
+        
+        try {
+			List<ReservableTennisCourt> ltcs = q.getReservableTennisCourts();
+			String[] columnNames = {"CourtId", "Surface", "CentreId"};
+			JPanel reservePanel = new JPanel();
+			reservePanel.setLayout(new BoxLayout(reservePanel, BoxLayout.PAGE_AXIS));
+			Object[][] data = new Object[ltcs.size()][4];
+			int i = 0;
+			
+			for(ReservableTennisCourt court: ltcs){
+	        	String[] info = {court.getCentreId(), court.getSurface(), court.getCentreId()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			
+			final JTable reserveTable = new JTable(data, columnNames);
+			JScrollPane scrollPane = new JScrollPane(reserveTable);
+			btcSubFrame.add(scrollPane);
+			btcSubFrame.setVisible(true);
+			
+			reserveTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+		        public void valueChanged(ListSelectionEvent event) {
+		        	reserveCourtId = reserveTable.getValueAt(reserveTable.getSelectedRow(), 0).toString();
+		            System.out.println("You have selected " + reserveCourtId);
+		            
+		            
+		        }
+		    });
+        } catch (SQLException e1) {
+			System.out.println("Something went wrong while loading ReservableTennisCourt");
+			e1.printStackTrace();
+		}
     }
 
     private void enrollLessonSubFrame(){
         String[] levelList = {"Novice", "Intermediate", "Advanced"};
-        JFrame elSubFrame = createSubFrame();
+        final JFrame elSubFrame = createSubFrame();
         JPanel elControlPanel = new JPanel();
         elControlPanel.setLayout(new FlowLayout());
         elSubFrame.add(new JLabel("Search and Enroll in a lesson"));
@@ -465,28 +501,80 @@ public class MainFrame extends JFrame implements ActionListener{
         levelComboBox.setVisible(true);
         elControlPanel.add(levelComboBox);
         elSubFrame.add(elControlPanel);
-        elSubFrame.setVisible(true);
         
         try {
 			List<LessonReportRow> lrrs = q.generateReport();
-			String[] columnNames = {"lid", "Level", "Coach Name", "CentreID"};
+			String[] columnNames = {"LessonId", "Level", "Coach Name", "CentreID", "Enrolled"};
 			JPanel lessonPanel = new JPanel();
 			lessonPanel.setLayout(new BoxLayout(lessonPanel, BoxLayout.PAGE_AXIS));
 			Object[][] data = new Object[lrrs.size()][4];
 			int i = 0;
+			
 			for(LessonReportRow lrr: lrrs){
-	        	String[] info = {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID()};
+				boolean customerEnrolled = q.customerEnrollsIn(customer.getCid(), lrr.getLID());
+				String[] info;
+				if (customerEnrolled) {
+					info = new String[] {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID(), "Enrolled"};
+				} else {
+					info = new String[]{lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID(), "Not Enrolled"};
+				}
+	        	//String[] info = {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID()};
 	        	data[i] = info;
 	        	i++;
 	        }
-			JTable lessonTable = new JTable(data, columnNames);
+			
+			final JTable lessonTable = new JTable(data, columnNames);
 			JScrollPane scrollPane = new JScrollPane(lessonTable);
+			
+			lessonTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+		        public void valueChanged(ListSelectionEvent event) {
+		        	lessonId = lessonTable.getValueAt(lessonTable.getSelectedRow(), 0).toString();
+		            System.out.println("You have selected " + lessonId); 
+		        }
+		    });
+			
 			elSubFrame.add(scrollPane);
+			JButton register = new JButton("Register");
+			JButton unEnroll = new JButton("Unenroll");
+			elSubFrame.add(register);
+			elSubFrame.add(unEnroll);
+			elSubFrame.setVisible(true);
+			
+			register.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						q.enrollCustomerLesson(customer.getCid(), lessonId);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				
+			});
+			
+			unEnroll.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						boolean deleted = q.unenrollCustomerLessons(customer.getCid(), lessonId);
+						if (deleted) {
+							elSubFrame.setVisible(false);
+							elSubFrame.dispose();
+							enrollLessonSubFrame();
+						}
+						System.out.println(deleted);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+				
+			});
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			System.out.println("Something went wrong while generatingReport");
 			e1.printStackTrace();
 		}
+        
+        
         // add listeners to text fields and combo box and constantly each field?
         levelComboBox.addActionListener(new ActionListener() {
             @Override
@@ -533,7 +621,7 @@ public class MainFrame extends JFrame implements ActionListener{
         	@Override
             public void actionPerformed(ActionEvent e) {
         		try{
-        		customer = q.getCustomer(customer.getCid());
+        		customer = q.getCustomer(customer.getCid(), customer.getPhone());
         		}catch(Exception err){
         			System.out.println("Error while updating");
         			err.printStackTrace();
@@ -546,7 +634,6 @@ public class MainFrame extends JFrame implements ActionListener{
     }
     
     
-    
     ActionListener updateCustName = new ActionListener(){
     	@Override
         public void actionPerformed(ActionEvent e) {
@@ -556,8 +643,6 @@ public class MainFrame extends JFrame implements ActionListener{
     			if(q == null) {
     				System.out.println("sometihng is wrong");
     			}
-    			System.out.println(custName);
-    			System.out.println(customer.getCid());
     			q.updateCustomerName(customer.getCid(), custName);
     		}catch(Exception err){
     			System.out.println("something went wrong while updating customer name");
@@ -574,6 +659,7 @@ public class MainFrame extends JFrame implements ActionListener{
     		String custPhone = o.getText();
     		try{
     			q.updateCustomerPhone(customer.getCid(), custPhone);
+    			customer.setPhone(custPhone);
     		}catch(Exception err){
     			System.out.println("something went wrong while updating customer phone");
     			err.printStackTrace();
@@ -659,18 +745,15 @@ public class MainFrame extends JFrame implements ActionListener{
     	
     	@Override
     	public void actionPerformed(ActionEvent e) {
-            System.out.println(id);
-            System.out.println(pass);
-//    		if (userType.equals("customer")){
-//    			q = new QueryFacade(false, id);
-//    		} else {
-//    			q = new QueryFacade(true, id);
-//    		}
-    		
 			try {
 				if (userType.equals("customer")){
-					customer = q.getCustomer(id);
-					produceCustomerFrame();
+					customer = q.getCustomer(id,pass);
+					if (customer == null) {
+	        			controlPanel.add(new JLabel("Username or Password is incorrect"));
+	        			} else {
+	        				produceCustomerFrame();
+	        			}
+					
 	    		} else if (userType.equals("admin")){
 	    			admin = q.getAdmin(id);
 	    			produceEmployeeFrame();

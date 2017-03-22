@@ -1,10 +1,15 @@
 package query;
-
+import java.util.Date;
+import java.lang.reflect.Array;
 import java.sql.Connection;
+
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +23,7 @@ import row.Employee;
 import row.LessonReportRow;
 import row.NestedAggregationRow;
 import row.SelectionRow;
+import row.ReservableTennisCourt;
 
 public class QueryFacade
 {
@@ -68,30 +74,30 @@ public class QueryFacade
 	}
 	
 	// Join query
-	public List<LessonReportRow> generateReport() throws SQLException
-	{
-		List<LessonReportRow> rows = new ArrayList<LessonReportRow>();
-		
-		String query = "SELECT l.lid, l.courtid, l.l_level, e.name, tc.centreid "
-				+ "FROM Lesson l, Coach c, EmployeesWorkAt e, TennisCourt t, TennisCentre tc "
-				+ "WHERE l.sin = c.sin AND c.sin = e.sin AND l.courtid = t.courtid AND t.centreid = tc.centreid";
-		
-		Statement s = conn.createStatement();
-		ResultSet rs = s.executeQuery(query);
-		while (rs.next())
+		public List<LessonReportRow> generateReport() throws SQLException
 		{
-			String lid = rs.getString(1);
-			int CourtID = rs.getInt(2);
-			String Level = rs.getString(3);
-			String CoachName = rs.getString(4);
-			String CentreID = rs.getString(5);
+			List<LessonReportRow> rows = new ArrayList<LessonReportRow>();
 			
-			LessonReportRow row = new LessonReportRow(lid, CourtID, Level, CoachName, CentreID);
-			rows.add(row);
+			String query = "SELECT l.lid, l.courtid, l.l_level, e.name, tc.centreid "
+					+ "FROM Lesson l, Coach c, EmployeesWorkAt e, TennisCourt t, TennisCentre tc "
+					+ "WHERE l.sin = c.sin AND c.sin = e.sin AND l.courtid = t.courtid AND t.centreid = tc.centreid";
+			
+			Statement s = conn.createStatement();
+			ResultSet rs = s.executeQuery(query);
+			while (rs.next())
+			{
+				String lid = rs.getString(1);
+				int CourtID = rs.getInt(2);
+				String Level = rs.getString(3);
+				String CoachName = rs.getString(4);
+				String CentreID = rs.getString(5);
+				
+				LessonReportRow row = new LessonReportRow(lid, CourtID, Level, CoachName, CentreID);
+				rows.add(row);
+			}
+			s.close();
+			return rows;
 		}
-		s.close();
-		return rows;
-	}
 	
 	// Division query: courts
 	public List<DivisionCourtRow> getDivisionCourts() throws SQLException
@@ -260,6 +266,64 @@ public class QueryFacade
 	}
 	
 	/*
+	 * Adds a Customer to a lesson. If insertion was successful returns true
+	 * else if customer was already enrolled it will return false.
+	 */
+	public boolean enrollCustomerLesson(String cid, String lid) throws SQLException {
+		String query = "INSERT INTO Enrolled_In values ('"+ lid +"','"+cid+ "')";
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	/*
+	 * Deletes a tuple in Enrolled_In table for the given cid and lid
+	 * Returns true if the delete was successful. Returns false if no row matched
+	 * the given info.
+	 */
+	public boolean unenrollCustomerLessons(String cid, String lid) throws SQLException {
+		String query = "DELETE FROM Enrolled_In e "
+				+ "WHERE e.cid = " + cid + " AND e.lid = " + lid;
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	
+	/*
+	 * Returns true if customer is already enrolled in lesson
+	 */
+	public boolean customerEnrollsIn(String cid, String lid) throws SQLException {
+		String query = "SELECT COUNT(*) " +
+					   "FROM Enrolled_In e " +
+					   "WHERE e.cid = " + cid +
+					   "AND e.lid = " + lid;
+		
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			int count = Integer.parseInt(rs.getString(1));
+			if (count <= 0) {
+				return false;
+			}
+			
+		}
+		s.close();
+		return true;
+	}
+	
+	/*
 	 * Update the name of the customer with the given cid. Returns
 	 * true if successful. Returns false if no customer with cid exists.
 	 */
@@ -346,10 +410,12 @@ public class QueryFacade
 		return true;
 	}
 	
-	public Customer getCustomer(String custid) throws SQLException {
+	public Customer getCustomer(String custid, String custPhone) throws SQLException {
 		String query = "SELECT * "
 				+ "FROM Customer c "
-				+ "WHERE c.cid = " + custid;	
+				+ "WHERE c.cid = " + custid
+				+ " AND c.phone = " + custPhone;
+				
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
 		
@@ -394,7 +460,7 @@ public class QueryFacade
 		
 		return admin;
 	}
-	
+
 	public List<Employee> getEmployees() throws SQLException
 	{
 		String query = "SELECT * FROM EmployeesWorkAt";
@@ -439,6 +505,79 @@ public class QueryFacade
 		s.close();
 		
 		return rows;
+	}
+
+	/*
+	 * gets all the TennisCourts there is a typo for surface type
+	 */
+	public List<ReservableTennisCourt> getReservableTennisCourts() throws SQLException {
+		String query = "SELECT t.courtid, t.suface_type, t.centreId"+
+						" FROM TennisCourt t, ReservableCourt rc" +
+						" WHERE t.courtid = rc.courtid";
+
+		List<ReservableTennisCourt> rows = new ArrayList<ReservableTennisCourt>();
+		
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			int courtId = rs.getInt(1);
+			String surfaceT = rs.getString(2);
+			String centreId = rs.getString(3);
+			
+			ReservableTennisCourt row = new ReservableTennisCourt(Integer.toString(courtId),surfaceT,centreId);
+			rows.add(row);
+		}
+		s.close();
+		return rows;
+	}
+	
+	/*
+	 * returns the start and end time of reservation for the specified court
+	 * the sql table start and end date seem to be mixed up
+	 */
+	public Date[] getCourtReservation(String courtId) throws SQLException{
+		String query = "SELECT r.r_date, r.starttime, r.endtime"+
+				" FROM ReservableCourt rc, Reserve r" +
+				" WHERE r.courtid = rc.courtid";
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		
+		while (rs.next())
+		{
+			Date reserveDate = rs.getDate(1);
+			Date endTime = rs.getTime(2);
+			Date startTime = rs.getTime(3);
+
+			DateFormat dfStart = new SimpleDateFormat("MM/dd/yyyy");
+			DateFormat dfEnd = new SimpleDateFormat("MM/dd/yyyy");
+			
+			String startUserDateString = dfStart.format(reserveDate);
+			startUserDateString = startUserDateString+" "+startTime;
+			
+			String endUserDateString = dfStart.format(reserveDate);
+			endUserDateString = endUserDateString+" "+endTime;
+			// you will get this format "MM/dd/yyyy HH:mm:ss" 
+
+			//then parse the new date here
+			try {
+				startTime = dfStart.parse(startUserDateString);
+				endTime = dfStart.parse(endUserDateString);
+				System.out.println(startTime);
+				System.out.println(endTime);
+				
+				return new Date[]{startTime, endTime};
+				
+			} catch (ParseException e) {
+				System.out.println("Parsing date is hard omg why help");
+				e.printStackTrace();
+			}
+			
+			
+		}
+		s.close();
+		
+		return null;
 	}
 	
 }

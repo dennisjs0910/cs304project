@@ -39,4 +39,8 @@ public class Customer {
 	public String getCid(){
 		return cid;
 	}
+	
+	public void setPhone(String phone){
+		this.phone = phone;
+	}
 }

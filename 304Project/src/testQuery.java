@@ -7,6 +7,7 @@ import row.AggregationLessonCountRow;
 import row.Customer;
 import row.NestedAggregationRow;
 import row.SelectionRow;
+import row.ReservableTennisCourt;
 
 public class testQuery {
 
@@ -24,9 +25,11 @@ public class testQuery {
 			//List<NestedAggregationRow> result = q.getNestedAggregation();
 			//boolean result = q.deleteEmployee("202020202");
 //			boolean result = q.deleteReservation("123456", 7);
-			Customer result = q.getCustomer("123456");
-			System.out.println("Selection query successful");
-			System.out.println(result);
+			q.getCourtReservation("000000007");
+		
+			
+			
+			
 		}
 		catch (SQLException e)
 		{
