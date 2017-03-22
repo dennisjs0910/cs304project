@@ -236,6 +236,7 @@ public class MainFrame extends JFrame implements ActionListener{
     	//back button 
         JButton goBack = new JButton("back");
         controlPanel.add(goBack);
+        
         goBack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -400,7 +401,8 @@ public class MainFrame extends JFrame implements ActionListener{
 	        	i++;
 	        }
 			JTable lessonTable = new JTable(data, columnNames);
-			elSubFrame.add(lessonTable);
+			JScrollPane scrollPane = new JScrollPane(lessonTable);
+			elSubFrame.add(scrollPane);
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			System.out.println("Something went wrong while generatingReport");
