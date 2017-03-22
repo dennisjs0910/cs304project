@@ -1,11 +1,15 @@
 package query;
 import java.util.Date;
+import java.lang.reflect.Array;
 import java.sql.Connection;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -482,25 +486,45 @@ public class QueryFacade
 	}
 	
 	/*
-	 * returns the time of reservation for the specified court
+	 * returns the start and end time of reservation for the specified court
 	 * the sql table start and end date seem to be mixed up
 	 */
-	public Date getCourtReservation(String courtId) throws SQLException{
+	public Date[] getCourtReservation(String courtId) throws SQLException{
 		String query = "SELECT r.r_date, r.starttime, r.endtime"+
 				" FROM ReservableCourt rc, Reserve r" +
 				" WHERE r.courtid = rc.courtid";
-		
-	
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
+		
 		while (rs.next())
 		{
 			Date reserveDate = rs.getDate(1);
 			Date endTime = rs.getTime(2);
 			Date startTime = rs.getTime(3);
-			System.out.println("date " + reserveDate);
-			System.out.println("start " +startTime);
-			System.out.println("end: " +endTime);
+
+			DateFormat dfStart = new SimpleDateFormat("MM/dd/yyyy");
+			DateFormat dfEnd = new SimpleDateFormat("MM/dd/yyyy");
+			
+			String startUserDateString = dfStart.format(reserveDate);
+			startUserDateString = startUserDateString+" "+startTime;
+			
+			String endUserDateString = dfStart.format(reserveDate);
+			endUserDateString = endUserDateString+" "+endTime;
+			// you will get this format "MM/dd/yyyy HH:mm:ss" 
+
+			//then parse the new date here
+			try {
+				startTime = dfStart.parse(startUserDateString);
+				endTime = dfStart.parse(endUserDateString);
+				System.out.println(startTime);
+				System.out.println(endTime);
+				
+				return new Date[]{startTime, endTime};
+				
+			} catch (ParseException e) {
+				System.out.println("Parsing date is hard omg why help");
+				e.printStackTrace();
+			}
 			
 			
 		}
