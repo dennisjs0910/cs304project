@@ -9,6 +9,7 @@ import query.QueryFacade;
 import row.Customer;
 import row.Employee;
 import row.LessonReportRow;
+import row.ReservableTennisCourt;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -43,6 +44,7 @@ public class MainFrame extends JFrame implements ActionListener{
     private Connection conn;
     
     private String lessonId;
+    private String reserveCourtId;
 
     public MainFrame(){
     	auth = new AuthenticateUser();
@@ -366,18 +368,47 @@ public class MainFrame extends JFrame implements ActionListener{
         }
     };
 
+    //Customer book tennis court sub frame.
     private void bookTennisCourtSubFrame(){
         JFrame btcSubFrame = createSubFrame();
         JPanel btcControlPanel = new JPanel();
         btcControlPanel.setLayout(new FlowLayout());
         JLabel header = new JLabel("Search and Reserve a Tennis Court");
-
-        btcControlPanel.add(header);
-
+        btcControlPanel.add(header);       
         btcSubFrame.add(btcControlPanel);
-        btcSubFrame.setVisible(true);
         // here we would render all reservations grouped by the day
-
+        
+        try {
+			List<ReservableTennisCourt> ltcs = q.getReservableTennisCourts();
+			String[] columnNames = {"CourtId", "Surface", "CentreId"};
+			JPanel reservePanel = new JPanel();
+			reservePanel.setLayout(new BoxLayout(reservePanel, BoxLayout.PAGE_AXIS));
+			Object[][] data = new Object[ltcs.size()][4];
+			int i = 0;
+			
+			for(ReservableTennisCourt court: ltcs){
+	        	String[] info = {court.getCentreId(), court.getSurface(), court.getCentreId()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			
+			final JTable reserveTable = new JTable(data, columnNames);
+			JScrollPane scrollPane = new JScrollPane(reserveTable);
+			btcSubFrame.add(scrollPane);
+			btcSubFrame.setVisible(true);
+			
+			reserveTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+		        public void valueChanged(ListSelectionEvent event) {
+		        	reserveCourtId = reserveTable.getValueAt(reserveTable.getSelectedRow(), 0).toString();
+		            System.out.println("You have selected " + reserveCourtId);
+		            
+		            
+		        }
+		    });
+        } catch (SQLException e1) {
+			System.out.println("Something went wrong while loading ReservableTennisCourt");
+			e1.printStackTrace();
+		}
     }
 
     private void enrollLessonSubFrame(){
@@ -419,9 +450,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			lessonTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 		        public void valueChanged(ListSelectionEvent event) {
 		        	lessonId = lessonTable.getValueAt(lessonTable.getSelectedRow(), 0).toString();
-		            System.out.println("You have selected " + lessonId);
-		            
-		            
+		            System.out.println("You have selected " + lessonId); 
 		        }
 		    });
 			
@@ -514,12 +543,6 @@ public class MainFrame extends JFrame implements ActionListener{
             public void actionPerformed(ActionEvent e) {
         		try{
         		customer = q.getCustomer(customer.getCid(), customer.getPhone());
-//        		if (customer == null) {
-//        			msglabel.setText("Username or Password is incorrect");
-//        			controlPanel.add(msglabel);
-//        			} else {
-//        				produceCustomerFrame();
-//        			}
         		}catch(Exception err){
         			System.out.println("Error while updating");
         			err.printStackTrace();
@@ -541,8 +564,6 @@ public class MainFrame extends JFrame implements ActionListener{
     			if(q == null) {
     				System.out.println("sometihng is wrong");
     			}
-    			System.out.println(custName);
-    			System.out.println(customer.getCid());
     			q.updateCustomerName(customer.getCid(), custName);
     		}catch(Exception err){
     			System.out.println("something went wrong while updating customer name");
@@ -627,14 +648,6 @@ public class MainFrame extends JFrame implements ActionListener{
     	
     	@Override
     	public void actionPerformed(ActionEvent e) {
-            System.out.println(id);
-            System.out.println(pass);
-//    		if (userType.equals("customer")){
-//    			q = new QueryFacade(false, id);
-//    		} else {
-//    			q = new QueryFacade(true, id);
-//    		}
-    		
 			try {
 				if (userType.equals("customer")){
 					customer = q.getCustomer(id,pass);

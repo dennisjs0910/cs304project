@@ -1,6 +1,7 @@
 package query;
-
+import java.util.Date;
 import java.sql.Connection;
+
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +18,7 @@ import row.Employee;
 import row.LessonReportRow;
 import row.NestedAggregationRow;
 import row.SelectionRow;
+import row.ReservableTennisCourt;
 
 public class QueryFacade
 {
@@ -453,5 +455,60 @@ public class QueryFacade
 		
 		return admin;
 	}
+	
+	/*
+	 * gets all the TennisCourts there is a typo for surface type
+	 */
+	public List<ReservableTennisCourt> getReservableTennisCourts() throws SQLException {
+		String query = "SELECT t.courtid, t.suface_type, t.centreId"+
+						" FROM TennisCourt t, ReservableCourt rc" +
+						" WHERE t.courtid = rc.courtid";
+
+		List<ReservableTennisCourt> rows = new ArrayList<ReservableTennisCourt>();
+		
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			int courtId = rs.getInt(1);
+			String surfaceT = rs.getString(2);
+			String centreId = rs.getString(3);
+			
+			ReservableTennisCourt row = new ReservableTennisCourt(Integer.toString(courtId),surfaceT,centreId);
+			rows.add(row);
+		}
+		s.close();
+		return rows;
+	}
+	
+	/*
+	 * returns the time of reservation for the specified court
+	 * the sql table start and end date seem to be mixed up
+	 */
+	public Date getCourtReservation(String courtId) throws SQLException{
+		String query = "SELECT r.r_date, r.starttime, r.endtime"+
+				" FROM ReservableCourt rc, Reserve r" +
+				" WHERE r.courtid = rc.courtid";
+		
+	
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			Date reserveDate = rs.getDate(1);
+			Date endTime = rs.getTime(2);
+			Date startTime = rs.getTime(3);
+			System.out.println("date " + reserveDate);
+			System.out.println("start " +startTime);
+			System.out.println("end: " +endTime);
+			
+			
+		}
+		s.close();
+		
+		return null;
+	}
+	
+	
 	
 }
