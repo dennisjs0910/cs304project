@@ -4,6 +4,7 @@ package ui;
 import javax.swing.*;
 
 import query.QueryFacade;
+import row.Coach;
 import row.Customer;
 import row.Employee;
 import row.LessonReportRow;
@@ -41,8 +42,6 @@ public class MainFrame extends JFrame implements ActionListener{
     private Connection conn;
 
     public MainFrame(){
-    	auth = new AuthenticateUser();
-        createHomeFrame();
     	q = new QueryFacade(false, "");
     	try {
 			q.connect();
@@ -50,7 +49,9 @@ public class MainFrame extends JFrame implements ActionListener{
 		} catch(Exception err){ 
 			System.out.println("no connection turn on your server");
 		}
-		
+
+    	auth = new AuthenticateUser();
+        createHomeFrame();
     }
 
     @Override
@@ -229,20 +230,98 @@ public class MainFrame extends JFrame implements ActionListener{
             }
         });
     }
+    // TODO
     // Frame for employees to search employees
     private void createEmployeeSearchFrame() {
-    	newFrame();
-    	headerLabel.setText("Search Employees");
+    	final JFrame main = createSubFrame();
+    	main.setVisible(true);
+    	JPanel panel = new JPanel();
+    	main.add(panel);
+    	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    	panel.add(new JLabel("Search Employees"));
     	//back button 
-        JButton goBack = new JButton("back");
-        controlPanel.add(goBack);
+        JLabel empLabel = new JLabel("Employees:");
         
-        goBack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	produceEmployeeFrame();
-            }
-        });
+        JPanel employeesPanel = new JPanel();
+        employeesPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        employeesPanel.setLayout(new BoxLayout(employeesPanel, BoxLayout.Y_AXIS));
+        employeesPanel.add(empLabel);
+        try {
+			List<Employee> employees = q.getEmployees();
+			String[] columnNames = {"SIN", "Phone Number", "Name", "Address", "CentreID"};
+			final Object[][] data = new Object[employees.size()][5];
+
+			int i=0;
+			for(Employee row: employees){
+	        	String[] info = {row.getSin(), row.getPhone(), row.getName(), row.getAddress(), row.getCentreID()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			final JTable lessonTable = new JTable(data, columnNames);
+
+			lessonTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+			lessonTable.getColumnModel().getColumn(1).setPreferredWidth(40);
+			lessonTable.getColumnModel().getColumn(3).setPreferredWidth(130);
+			lessonTable.getColumnModel().getColumn(4).setPreferredWidth(20);
+			lessonTable.setPreferredSize(new Dimension(500, 200));
+			JScrollPane scrollPane = new JScrollPane(lessonTable);
+			scrollPane.setPreferredSize(new Dimension(600, 200));
+			employeesPanel.add(scrollPane);
+			
+	        JButton deleteEmployeeButton = new JButton("Delete employee");
+	        deleteEmployeeButton.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	            	String sin = (String) data[lessonTable.getSelectedRow()][0];
+	            	String name = (String) data[lessonTable.getSelectedRow()][2];
+	            	try {
+						q.deleteEmployee(sin);
+						main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
+		            	createEmployeeSearchFrame();
+						JFrame popUp = createPopup("Success!", "Deletion of employee " + name + " with SIN: " + sin + " was successful.");
+		            	popUp.setVisible(true);
+					} catch (SQLException e1) {
+						JFrame popUp = new JFrame("Delete was unsuccessful." + e1.getMessage());
+					}
+	            }
+	        });
+	        
+	        employeesPanel.add(deleteEmployeeButton);
+		} catch (SQLException e1) {
+			// TODO Error Handling
+			System.out.println("Something went wrong while getting Employees");
+			e1.printStackTrace();
+		}
+        
+        panel.add(employeesPanel);
+        
+        JPanel coachesPanel = new JPanel();
+        coachesPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        coachesPanel.setLayout(new BoxLayout(coachesPanel, BoxLayout.Y_AXIS));
+        
+        coachesPanel.add(new JLabel("Coaches"));
+        try {
+			List<Coach> coaches = q.getCoaches();
+			String[] columnNames = {"SIN", "Certification Number"};
+			Object[][] data = new Object[coaches.size()][2];
+			int i = 0;
+			for(Coach coach: coaches){
+	        	String[] info = {coach.getSIN(), coach.getCertificationID()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			JTable lessonTable = new JTable(data, columnNames);
+			JScrollPane scrollPane = new JScrollPane(lessonTable);
+			scrollPane.setPreferredSize(new Dimension(600, 200));
+			coachesPanel.add(scrollPane);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			System.out.println("Something went wrong while getting Coaches");
+			e1.printStackTrace();
+		}
+        
+        panel.add(coachesPanel);
     }
     // Frame for employees to search for customers
     // Employees can access customer information, reservations, and lessons from this frame
@@ -535,6 +614,24 @@ public class MainFrame extends JFrame implements ActionListener{
         final JFrame frame = new JFrame();
         frame.setSize(750, 750);
         frame.setLayout(new FlowLayout());
+
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent windowEvent){
+                frame.dispose();
+            }
+        });
+        return frame;
+    }
+    
+    private JFrame createPopup(String title, String message)
+    {
+    	final JFrame frame = new JFrame(title);
+        frame.setSize(700, 100);
+        frame.setLayout(new FlowLayout());
+        
+        JPanel panel = new JPanel();
+        panel.add(new JLabel(message));
+        frame.add(panel);
 
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent){

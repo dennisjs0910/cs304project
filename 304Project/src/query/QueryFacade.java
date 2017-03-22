@@ -10,6 +10,7 @@ import java.util.List;
 
 import row.AggregationLessonAvgAgeRow;
 import row.AggregationLessonCountRow;
+import row.Coach;
 import row.Customer;
 import row.DivisionCoachRow;
 import row.DivisionCourtRow;
@@ -392,6 +393,52 @@ public class QueryFacade
 		s.close();
 		
 		return admin;
+	}
+	
+	public List<Employee> getEmployees() throws SQLException
+	{
+		String query = "SELECT * FROM EmployeesWorkAt";
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		
+		List<Employee> employees = new ArrayList<Employee>();
+		
+		while (rs.next())
+		{
+			
+			String sin = rs.getString(1);
+			String phone = rs.getString(2);
+			String name = rs.getString(3);
+			String address = rs.getString(4);
+			String centreID = rs.getString(5);
+			
+			Employee emp = new Employee(sin, phone, name, address ,centreID);
+			employees.add(emp);
+		}
+		s.close();
+		
+		return employees;
+	}
+	
+	public List<Coach> getCoaches() throws SQLException
+	{
+		String query = "SELECT * FROM Coach";
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		
+		List<Coach> rows = new ArrayList<Coach>();
+		while(rs.next())
+		{
+			String sin = rs.getString(1);
+			String certID = rs.getString(2);
+			
+			Coach coach = new Coach(sin, certID);
+			rows.add(coach);
+		}
+		
+		s.close();
+		
+		return rows;
 	}
 	
 }
