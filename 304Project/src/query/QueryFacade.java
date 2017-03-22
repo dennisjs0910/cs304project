@@ -273,9 +273,28 @@ public class QueryFacade
 		}
 		return true;
 	}
+	
+	/*
+	 * Deletes a tuple in Enrolled_In table for the given cid and lid
+	 * Returns true if the delete was successful. Returns false if no row matched
+	 * the given info.
+	 */
+	public boolean unenrollCustomerLessons(String cid, String lid) throws SQLException {
+		String query = "DELETE FROM Enrolled_In e "
+				+ "WHERE e.cid = " + cid + " AND e.lid = " + lid;
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	
 	/*
 	 * Returns true if customer is already enrolled in lesson
-	 * 
 	 */
 	public boolean customerEnrollsIn(String cid, String lid) throws SQLException {
 		String query = "SELECT COUNT(*) " +

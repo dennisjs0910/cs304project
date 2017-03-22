@@ -382,7 +382,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
     private void enrollLessonSubFrame(){
         String[] levelList = {"Novice", "Intermediate", "Advanced"};
-        JFrame elSubFrame = createSubFrame();
+        final JFrame elSubFrame = createSubFrame();
         JPanel elControlPanel = new JPanel();
         elControlPanel.setLayout(new FlowLayout());
         elSubFrame.add(new JLabel("Search and Enroll in a lesson"));
@@ -427,18 +427,35 @@ public class MainFrame extends JFrame implements ActionListener{
 			
 			elSubFrame.add(scrollPane);
 			JButton register = new JButton("Register");
+			JButton unEnroll = new JButton("Unenroll");
 			elSubFrame.add(register);
+			elSubFrame.add(unEnroll);
 			elSubFrame.setVisible(true);
 			
 			register.addActionListener(new ActionListener(){
-
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						boolean a = q.enrollCustomerLesson(customer.getCid(), lessonId);
-						System.out.println(a);
+						q.enrollCustomerLesson(customer.getCid(), lessonId);
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				
+			});
+			
+			unEnroll.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						boolean deleted = q.unenrollCustomerLessons(customer.getCid(), lessonId);
+						if (deleted) {
+							elSubFrame.setVisible(false);
+							elSubFrame.dispose();
+							enrollLessonSubFrame();
+						}
+						System.out.println(deleted);
+					} catch (SQLException e1) {
 						e1.printStackTrace();
 					}
 				}
