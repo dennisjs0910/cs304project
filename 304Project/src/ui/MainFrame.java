@@ -2,6 +2,8 @@ package ui;
 
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import query.QueryFacade;
 import row.Customer;
@@ -39,6 +41,8 @@ public class MainFrame extends JFrame implements ActionListener{
     private Employee admin;
     private QueryFacade q;
     private Connection conn;
+    
+    private String lessonId;
 
     public MainFrame(){
     	auth = new AuthenticateUser();
@@ -387,30 +391,65 @@ public class MainFrame extends JFrame implements ActionListener{
         levelComboBox.setVisible(true);
         elControlPanel.add(levelComboBox);
         elSubFrame.add(elControlPanel);
-        elSubFrame.setVisible(true);
         
         try {
 			List<LessonReportRow> lrrs = q.generateReport();
-			String[] columnNames = {"lid", "Level", "Coach Name", "CentreID"};
+			String[] columnNames = {"LessonId", "Level", "Coach Name", "CentreID", "Enrolled"};
 			JPanel lessonPanel = new JPanel();
 			lessonPanel.setLayout(new BoxLayout(lessonPanel, BoxLayout.PAGE_AXIS));
 			Object[][] data = new Object[lrrs.size()][4];
 			int i = 0;
+			
 			for(LessonReportRow lrr: lrrs){
-	        	String[] info = {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID()};
+				boolean customerEnrolled = q.customerEnrollsIn(customer.getCid(), lrr.getLID());
+				String[] info;
+				if (customerEnrolled) {
+					info = new String[] {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID(), "Enrolled"};
+				} else {
+					info = new String[]{lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID(), "Not Enrolled"};
+				}
+	        	//String[] info = {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID()};
 	        	data[i] = info;
 	        	i++;
 	        }
-			JTable lessonTable = new JTable(data, columnNames);
+			
+			final JTable lessonTable = new JTable(data, columnNames);
 			JScrollPane scrollPane = new JScrollPane(lessonTable);
 			
-		
+			lessonTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+		        public void valueChanged(ListSelectionEvent event) {
+		        	lessonId = lessonTable.getValueAt(lessonTable.getSelectedRow(), 0).toString();
+		            System.out.println("You have selected " + lessonId);
+		            
+		            
+		        }
+		    });
+			
 			elSubFrame.add(scrollPane);
+			JButton register = new JButton("Register");
+			elSubFrame.add(register);
+			elSubFrame.setVisible(true);
+			
+			register.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						boolean a = q.enrollCustomerLesson(customer.getCid(), lessonId);
+						System.out.println(a);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				
+			});
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			System.out.println("Something went wrong while generatingReport");
 			e1.printStackTrace();
 		}
+        
+        
         // add listeners to text fields and combo box and constantly each field?
         levelComboBox.addActionListener(new ActionListener() {
             @Override
