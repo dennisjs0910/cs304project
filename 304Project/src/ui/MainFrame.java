@@ -83,6 +83,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
     public void produceCustomerFrame() {
         newFrame();
+        System.out.println(customer);
         headerLabel.setText("Welcome " + customer.getName());
         JButton searchBookTennisCourt = new JButton("Tennis Court Reservation");
         JButton searchEnrollLesson = new JButton("Tennis Court Lessons");
@@ -402,6 +403,8 @@ public class MainFrame extends JFrame implements ActionListener{
 	        }
 			JTable lessonTable = new JTable(data, columnNames);
 			JScrollPane scrollPane = new JScrollPane(lessonTable);
+			
+		
 			elSubFrame.add(scrollPane);
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
@@ -454,7 +457,13 @@ public class MainFrame extends JFrame implements ActionListener{
         	@Override
             public void actionPerformed(ActionEvent e) {
         		try{
-        		customer = q.getCustomer(customer.getCid());
+        		customer = q.getCustomer(customer.getCid(), customer.getPhone());
+//        		if (customer == null) {
+//        			msglabel.setText("Username or Password is incorrect");
+//        			controlPanel.add(msglabel);
+//        			} else {
+//        				produceCustomerFrame();
+//        			}
         		}catch(Exception err){
         			System.out.println("Error while updating");
         			err.printStackTrace();
@@ -465,7 +474,6 @@ public class MainFrame extends JFrame implements ActionListener{
         	}
         });
     }
-    
     
     
     ActionListener updateCustName = new ActionListener(){
@@ -495,6 +503,7 @@ public class MainFrame extends JFrame implements ActionListener{
     		String custPhone = o.getText();
     		try{
     			q.updateCustomerPhone(customer.getCid(), custPhone);
+    			customer.setPhone(custPhone);
     		}catch(Exception err){
     			System.out.println("something went wrong while updating customer phone");
     			err.printStackTrace();
@@ -572,8 +581,13 @@ public class MainFrame extends JFrame implements ActionListener{
     		
 			try {
 				if (userType.equals("customer")){
-					customer = q.getCustomer(id);
-					produceCustomerFrame();
+					customer = q.getCustomer(id,pass);
+					if (customer == null) {
+	        			controlPanel.add(new JLabel("Username or Password is incorrect"));
+	        			} else {
+	        				produceCustomerFrame();
+	        			}
+					
 	    		} else if (userType.equals("admin")){
 	    			admin = q.getAdmin(id);
 	    			produceEmployeeFrame();

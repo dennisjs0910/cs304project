@@ -345,10 +345,12 @@ public class QueryFacade
 		return true;
 	}
 	
-	public Customer getCustomer(String custid) throws SQLException {
+	public Customer getCustomer(String custid, String custPhone) throws SQLException {
 		String query = "SELECT * "
 				+ "FROM Customer c "
-				+ "WHERE c.cid = " + custid;	
+				+ "WHERE c.cid = " + custid
+				+ " AND c.phone = " + custPhone;
+				
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
 		

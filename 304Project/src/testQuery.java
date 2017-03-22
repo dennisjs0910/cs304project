@@ -24,9 +24,9 @@ public class testQuery {
 			//List<NestedAggregationRow> result = q.getNestedAggregation();
 			//boolean result = q.deleteEmployee("202020202");
 //			boolean result = q.deleteReservation("123456", 7);
-			Customer result = q.getCustomer("123456");
+			Customer result = q.getCustomer("123456", "7782884498");
 			System.out.println("Selection query successful");
-			System.out.println(result);
+			System.out.println(result.getPhone());
 		}
 		catch (SQLException e)
 		{
