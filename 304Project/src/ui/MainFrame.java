@@ -13,6 +13,7 @@ import row.LessonReportRow;
 import row.ReservableTennisCourt;
 import row.AggregationLessonCountRow;
 import row.AggregationLessonAvgAgeRow;
+import row.NestedAggregationRow;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -289,8 +290,13 @@ public class MainFrame extends JFrame implements ActionListener{
     }
     // Frame for employees to update court information
     private void createEmployeeCourtsFrame() {
-    	newFrame();
-    	headerLabel.setText("Update Courts");
+    	final JFrame main = createSubFrame();
+    	main.setVisible(true);
+    	JPanel panel = new JPanel();
+    	main.add(panel);
+    	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    	panel.add(new JLabel("Court information"));
     	//back button 
         JButton goBack = new JButton("back");
         controlPanel.add(goBack);
@@ -300,6 +306,37 @@ public class MainFrame extends JFrame implements ActionListener{
             	produceEmployeeFrame();
             }
         });
+      //Nested Aggregation query for maximum reservations
+        JPanel maxReservationsPanel = new JPanel();
+        maxReservationsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        maxReservationsPanel.setLayout(new BoxLayout(maxReservationsPanel, BoxLayout.Y_AXIS));
+       
+        JLabel maxReservationsLabel = new JLabel("Customer with the most reservations:");
+        maxReservationsPanel.add(maxReservationsLabel);
+        try{
+        	List<NestedAggregationRow> NestedRow = q.getNestedAggregation();
+        	String[] columnNames = {"Customer ID", "Customer Name", "Number of Reservations"};
+        	final Object[][] data = new Object[NestedRow.size()][3];
+
+			int i=0;
+			for(NestedAggregationRow row: NestedRow){
+	        	String[] info = { row.getCID(), row.getCName(), String.valueOf(row.getMaxNumReservations())};
+	        	data[i] = info;
+	        	i++;
+	        }
+			final JTable NestedTable = new JTable(data,columnNames);
+			NestedTable.setPreferredSize(new Dimension(400, 100));
+			JScrollPane scrollPane = new JScrollPane(NestedTable);
+			scrollPane.setPreferredSize(new Dimension(400, 100));
+			maxReservationsPanel.add(scrollPane);
+        } catch (SQLException e){
+        	System.out.println("Problem retrieving nested aggregation for maximum reservations");
+			e.printStackTrace();
+        }
+        panel.add(maxReservationsPanel);
+        
+        
+        
     }
     // TODO
     // Frame for employees to search employees
