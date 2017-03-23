@@ -11,6 +11,8 @@ import row.Customer;
 import row.Employee;
 import row.LessonReportRow;
 import row.ReservableTennisCourt;
+import row.AggregationLessonCountRow;
+import row.AggregationLessonAvgAgeRow;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -211,8 +213,13 @@ public class MainFrame extends JFrame implements ActionListener{
     }
     // Frame for employees to update lesson information
     private void createEmployeeLessonsFrame() {
-    	newFrame();
-    	headerLabel.setText("Update Lessons");
+    	final JFrame main = createSubFrame();
+    	main.setVisible(true);
+    	JPanel panel = new JPanel();
+    	main.add(panel);
+    	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    	panel.add(new JLabel("Lesson information"));
     	//back button 
         JButton goBack = new JButton("back");
         controlPanel.add(goBack);
@@ -222,6 +229,63 @@ public class MainFrame extends JFrame implements ActionListener{
             	produceEmployeeFrame();
             }
         });
+        //Lesson count
+        JPanel lessonCountPanel = new JPanel();
+        lessonCountPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        lessonCountPanel.setLayout(new BoxLayout(lessonCountPanel, BoxLayout.Y_AXIS));
+        JLabel lessonLabel = new JLabel("Number of Students Enrolled:");
+        lessonCountPanel.add(lessonLabel);
+        try{
+        	List<AggregationLessonCountRow> lessonCountRow = q.getAggregationLessonCount();
+        	String[] columnNames = {"Number of Students", "Lesson ID", "Lesson Level"};
+        	final Object[][] data = new Object[lessonCountRow.size()][3];
+
+			int i=0;
+			for(AggregationLessonCountRow row: lessonCountRow){
+	        	String[] info = { String.valueOf(row.getNumStudents()), row.getLID(), row.getLevel()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			final JTable aggregateLessonCountTable = new JTable(data,columnNames);
+			aggregateLessonCountTable.setPreferredSize(new Dimension(400, 100));
+			JScrollPane scrollPane = new JScrollPane(aggregateLessonCountTable);
+			scrollPane.setPreferredSize(new Dimension(400, 100));
+			lessonCountPanel.add(scrollPane);
+        } catch (SQLException e){
+        	System.out.println("Problem retrieving aggregation lesson count");
+			e.printStackTrace();
+        }
+        panel.add(lessonCountPanel);
+        //Average lesson age query
+        JPanel lessonAgePanel = new JPanel();
+        lessonAgePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        lessonAgePanel.setLayout(new BoxLayout(lessonAgePanel, BoxLayout.Y_AXIS));
+       
+        JLabel lessonAgeLabel = new JLabel("Average age of Students Enrolled:");
+        lessonAgePanel.add(lessonAgeLabel);
+        try{
+        	List<AggregationLessonAvgAgeRow> lessonAgeRow = q.getAggregationAvgAgeLesson();
+        	String[] columnNames = {"Average Age of Students", "Lesson ID", "Lesson Level"};
+        	final Object[][] data = new Object[lessonAgeRow.size()][3];
+
+			int i=0;
+			for(AggregationLessonAvgAgeRow row: lessonAgeRow){
+	        	String[] info = { String.valueOf(row.getAverageAge()), row.getLID(), row.getLevel()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			final JTable aggregateLessonAgeTable = new JTable(data,columnNames);
+			aggregateLessonAgeTable.setPreferredSize(new Dimension(400, 100));
+			JScrollPane scrollPane = new JScrollPane(aggregateLessonAgeTable);
+			scrollPane.setPreferredSize(new Dimension(400, 100));
+			lessonAgePanel.add(scrollPane);
+        } catch (SQLException e){
+        	System.out.println("Problem retrieving aggregation lesson age");
+			e.printStackTrace();
+        }
+        panel.add(lessonAgePanel);
+        
+        
     }
     // Frame for employees to update court information
     private void createEmployeeCourtsFrame() {
@@ -265,6 +329,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	        	data[i] = info;
 	        	i++;
 	        }
+			
 			final JTable lessonTable = new JTable(data, columnNames);
 
 			lessonTable.getColumnModel().getColumn(0).setPreferredWidth(40);
@@ -353,6 +418,9 @@ public class MainFrame extends JFrame implements ActionListener{
             	produceEmployeeFrame();
             }
         });
+        
+        
+        
     }
     
 
