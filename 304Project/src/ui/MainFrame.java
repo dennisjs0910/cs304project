@@ -14,6 +14,7 @@ import row.ReservableTennisCourt;
 import row.AggregationLessonCountRow;
 import row.AggregationLessonAvgAgeRow;
 import row.NestedAggregationRow;
+import row.DivisionCourtRow;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -221,15 +222,7 @@ public class MainFrame extends JFrame implements ActionListener{
     	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     	panel.add(new JLabel("Lesson information"));
-    	//back button 
-        JButton goBack = new JButton("back");
-        controlPanel.add(goBack);
-        goBack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	produceEmployeeFrame();
-            }
-        });
+    	
         //Lesson count
         JPanel lessonCountPanel = new JPanel();
         lessonCountPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -285,8 +278,15 @@ public class MainFrame extends JFrame implements ActionListener{
 			e.printStackTrace();
         }
         panel.add(lessonAgePanel);
-        
-        
+      //close button 
+        JButton close = new JButton("Close");
+        panel.add(close);
+        close.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	main.setVisible(false);
+            }
+        });
     }
     // Frame for employees to update court information
     private void createEmployeeCourtsFrame() {
@@ -297,15 +297,6 @@ public class MainFrame extends JFrame implements ActionListener{
     	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     	panel.add(new JLabel("Court information"));
-    	//back button 
-        JButton goBack = new JButton("back");
-        controlPanel.add(goBack);
-        goBack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	produceEmployeeFrame();
-            }
-        });
       //Nested Aggregation query for maximum reservations
         JPanel maxReservationsPanel = new JPanel();
         maxReservationsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -334,9 +325,15 @@ public class MainFrame extends JFrame implements ActionListener{
 			e.printStackTrace();
         }
         panel.add(maxReservationsPanel);
-        
-        
-        
+      //close button 
+        JButton close = new JButton("Close");
+        panel.add(close);
+        close.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	main.setVisible(false);
+            }
+        });
     }
     // TODO
     // Frame for employees to search employees
@@ -348,7 +345,7 @@ public class MainFrame extends JFrame implements ActionListener{
     	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     	panel.add(new JLabel("Search Employees"));
-    	//back button 
+
         JLabel empLabel = new JLabel("Employees:");
         
         JPanel employeesPanel = new JPanel();
@@ -433,31 +430,52 @@ public class MainFrame extends JFrame implements ActionListener{
         panel.add(coachesPanel);
     }
     // Frame for employees to search for customers
-    // Employees can access customer information, reservations, and lessons from this frame
     private void createCustomerSearchFrame() {
-    	newFrame();
-    	headerLabel.setText("Search Customers");
-    	//Button for updateCustomer Frame
-        JButton updateCusotmerInfoButton = new JButton("Update Customer Info");
-        controlPanel.add(updateCusotmerInfoButton);
-        updateCusotmerInfoButton.addActionListener(new ActionListener(){
-        	@Override
-        	public void actionPerformed(ActionEvent e){
-        		custUpdateSubFrame();
-        	}
-        });
-      //back button 
-        JButton goBack = new JButton("back");
-        controlPanel.add(goBack);
-        goBack.addActionListener(new ActionListener() {
+    	final JFrame main = createSubFrame();
+    	main.setVisible(true);
+    	JPanel panel = new JPanel();
+    	main.add(panel);
+    	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    	panel.add(new JLabel("Customer Reservation information"));
+    	//Division Court Row
+    	JPanel divisionCourtPanel = new JPanel();
+    	divisionCourtPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    	divisionCourtPanel.setLayout(new BoxLayout(divisionCourtPanel, BoxLayout.Y_AXIS));
+       
+        JLabel divisionCourtLabel = new JLabel("Customers that reserved hard surface courts:");
+        divisionCourtPanel.add(divisionCourtLabel);
+        try{
+        	List<DivisionCourtRow> DivisionRow = q.getDivisionCourts();
+        	String[] columnNames = {"Customer ID", "Customer Name"};
+        	final Object[][] data = new Object[DivisionRow.size()][2];
+
+			int i=0;
+			for(DivisionCourtRow row: DivisionRow){
+	        	String[] info = { row.getCID(), row.getCName()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			final JTable DivisionCourtTable = new JTable(data,columnNames);
+			DivisionCourtTable.setPreferredSize(new Dimension(400, 100));
+			JScrollPane scrollPane = new JScrollPane(DivisionCourtTable);
+			scrollPane.setPreferredSize(new Dimension(400, 100));
+			divisionCourtPanel.add(scrollPane);
+        } catch (SQLException e){
+        	System.out.println("Problem retrieving division courts");
+			e.printStackTrace();
+        }
+        panel.add(divisionCourtPanel);
+
+    	//close button 
+        JButton close = new JButton("Close");
+        panel.add(close);
+        close.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	produceEmployeeFrame();
+            	main.setVisible(false);
             }
         });
-        
-        
-        
     }
     
 
