@@ -511,7 +511,7 @@ public class QueryFacade
 	 * gets all the TennisCourts there is a typo for surface type
 	 */
 	public List<ReservableTennisCourt> getReservableTennisCourts() throws SQLException {
-		String query = "SELECT t.courtid, t.suface_type, t.centreId"+
+		String query = "SELECT rc.courtid, t.suface_type, t.centreId"+
 						" FROM TennisCourt t, ReservableCourt rc" +
 						" WHERE t.courtid = rc.courtid";
 
@@ -536,48 +536,25 @@ public class QueryFacade
 	 * returns the start and end time of reservation for the specified court
 	 * the sql table start and end date seem to be mixed up
 	 */
-	public Date[] getCourtReservation(String courtId) throws SQLException{
+	public List<Date[]> getCourtReservation(String courtId) throws SQLException{
 		String query = "SELECT r.r_date, r.starttime, r.endtime"+
 				" FROM ReservableCourt rc, Reserve r" +
-				" WHERE r.courtid = rc.courtid";
+				" WHERE r.courtid = rc.courtid AND r.courtid = " + courtId;
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
-		
+		List<Date[]> reservationDates = new ArrayList<>();
 		while (rs.next())
 		{
 			Date reserveDate = rs.getDate(1);
 			Date endTime = rs.getTime(2);
 			Date startTime = rs.getTime(3);
-
-			DateFormat dfStart = new SimpleDateFormat("MM/dd/yyyy");
-			DateFormat dfEnd = new SimpleDateFormat("MM/dd/yyyy");
-			
-			String startUserDateString = dfStart.format(reserveDate);
-			startUserDateString = startUserDateString+" "+startTime;
-			
-			String endUserDateString = dfStart.format(reserveDate);
-			endUserDateString = endUserDateString+" "+endTime;
-			// you will get this format "MM/dd/yyyy HH:mm:ss" 
-
-			//then parse the new date here
-			try {
-				startTime = dfStart.parse(startUserDateString);
-				endTime = dfStart.parse(endUserDateString);
-				System.out.println(startTime);
-				System.out.println(endTime);
-				
-				return new Date[]{startTime, endTime};
-				
-			} catch (ParseException e) {
-				System.out.println("Parsing date is hard omg why help");
-				e.printStackTrace();
-			}
-			
+			Date[] reservationDate = new Date[]{reserveDate, startTime,endTime};
+			reservationDates.add(reservationDate);
 			
 		}
 		s.close();
 		
-		return null;
+		return reservationDates;
 	}
 	
 }

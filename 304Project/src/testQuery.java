@@ -24,8 +24,10 @@ public class testQuery {
 			//List<AggregationLessonAvgAgeRow> result = q.getAggregationAvgAgeLesson();
 			//List<NestedAggregationRow> result = q.getNestedAggregation();
 			//boolean result = q.deleteEmployee("202020202");
-//			boolean result = q.deleteReservation("123456", 7);
-			q.getCourtReservation("000000007");
+			//boolean result = q.deleteReservation("123456", 7);
+			Customer a = q.getCustomer("123456", "6048221111");
+			//q.getCourtReservation("000000007");
+			System.out.println(a);
 		
 			
 			

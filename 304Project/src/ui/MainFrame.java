@@ -2,6 +2,7 @@ package ui;
 
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -24,6 +25,7 @@ import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -563,7 +565,6 @@ public class MainFrame extends JFrame implements ActionListener{
     ActionListener savePassword = new ActionListener(){
     	@Override
         public void actionPerformed(ActionEvent e) {
-    		System.out.println("I have been hit");
     		JTextField o = (JTextField)e.getSource();
     		String password = o.getText();
     		auth.setPassword(password);
@@ -572,7 +573,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
     //Customer book tennis court sub frame.
     private void bookTennisCourtSubFrame(){
-        JFrame btcSubFrame = createSubFrame();
+        final JFrame btcSubFrame = createSubFrame();
         JPanel btcControlPanel = new JPanel();
         btcControlPanel.setLayout(new FlowLayout());
         JLabel header = new JLabel("Search and Reserve a Tennis Court");
@@ -589,7 +590,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			int i = 0;
 			
 			for(ReservableTennisCourt court: ltcs){
-	        	String[] info = {court.getCentreId(), court.getSurface(), court.getCentreId()};
+	        	String[] info = {court.getCourtId(), court.getSurface(), court.getCentreId()};
 	        	data[i] = info;
 	        	i++;
 	        }
@@ -597,16 +598,73 @@ public class MainFrame extends JFrame implements ActionListener{
 			final JTable reserveTable = new JTable(data, columnNames);
 			JScrollPane scrollPane = new JScrollPane(reserveTable);
 			btcSubFrame.add(scrollPane);
-			btcSubFrame.setVisible(true);
 			
+			JButton showReservationButton = new JButton("Show Reservation");
+			JButton reservationButton = new JButton("Reserve Court");
+			btcSubFrame.add(showReservationButton);
+			btcSubFrame.add(reservationButton);
+			btcSubFrame.setVisible(true);
 			reserveTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 		        public void valueChanged(ListSelectionEvent event) {
 		        	reserveCourtId = reserveTable.getValueAt(reserveTable.getSelectedRow(), 0).toString();
-		            System.out.println("You have selected " + reserveCourtId);
+		            
 		            
 		            
 		        }
 		    });
+			
+			showReservationButton.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Border raisedbevel = BorderFactory.createRaisedBevelBorder();
+					Border loweredbevel = BorderFactory.createLoweredBevelBorder();
+					Border compound = BorderFactory.createCompoundBorder(raisedbevel, loweredbevel);
+					
+					final JFrame resInfo = createSubFrame();
+			    	JPanel panel = new JPanel();
+			    	panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+			    	resInfo.add(panel);
+					JLabel reserveHeader = new JLabel("Court "+reserveCourtId);
+					reserveHeader.setSize(50,50);
+					panel.add(reserveHeader);
+					try {
+						System.out.println("Search " + reserveCourtId);
+						List<Date[]> dates =  q.getCourtReservation(reserveCourtId);
+						if (dates.size() == 0) {
+							JLabel reserveInfo = new JLabel("Has not been reserved yet");
+							reserveInfo.setBorder(compound);
+							panel.add(reserveInfo);
+						} else {
+							for(Date[] date: dates) {
+								String noticeLabel = "Reserved on " + date[0]+ " from " + date[1]+ " to "+date[2];
+								JLabel reserveInfo = new JLabel(noticeLabel);
+								reserveInfo.setBorder(compound);
+								panel.add(reserveInfo);
+								System.out.println(noticeLabel);
+							}
+						}
+						
+					resInfo.setVisible(true);	
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+			
+			reservationButton.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
         } catch (SQLException e1) {
 			System.out.println("Something went wrong while loading ReservableTennisCourt");
 			e1.printStackTrace();
@@ -668,6 +726,9 @@ public class MainFrame extends JFrame implements ActionListener{
 				public void actionPerformed(ActionEvent e) {
 					try {
 						q.enrollCustomerLesson(customer.getCid(), lessonId);
+						elSubFrame.setVisible(false);
+						elSubFrame.dispose();
+						enrollLessonSubFrame();
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					}
@@ -872,8 +933,10 @@ public class MainFrame extends JFrame implements ActionListener{
 				if (userType.equals("customer")){
 					customer = q.getCustomer(id,pass);
 					if (customer == null) {
+						System.out.println("Customer does not exist");
 	        			controlPanel.add(new JLabel("Username or Password is incorrect"));
 	        			} else {
+	        				System.out.println("producing customer frame");
 	        				produceCustomerFrame();
 	        			}
 					
