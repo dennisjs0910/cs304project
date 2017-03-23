@@ -52,6 +52,9 @@ public class MainFrame extends JFrame implements ActionListener{
     
     private String lessonId;
     private String reserveCourtId;
+    private String reservationDate;
+    private String rStartTime;
+    private String rEndTime;
 
     public MainFrame(){
     	q = new QueryFacade(false, "");
@@ -574,7 +577,7 @@ public class MainFrame extends JFrame implements ActionListener{
     //Customer book tennis court sub frame.
     private void bookTennisCourtSubFrame(){
         final JFrame btcSubFrame = createSubFrame();
-        JPanel btcControlPanel = new JPanel();
+        final JPanel btcControlPanel = new JPanel();
         btcControlPanel.setLayout(new FlowLayout());
         JLabel header = new JLabel("Search and Reserve a Tennis Court");
         btcControlPanel.add(header);       
@@ -600,7 +603,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			btcSubFrame.add(scrollPane);
 			
 			JButton showReservationButton = new JButton("Show Reservation");
-			JButton reservationButton = new JButton("Reserve Court");
+			final JButton reservationButton = new JButton("Reserve Court");
 			btcSubFrame.add(showReservationButton);
 			btcSubFrame.add(reservationButton);
 			btcSubFrame.setVisible(true);
@@ -647,20 +650,82 @@ public class MainFrame extends JFrame implements ActionListener{
 						
 					resInfo.setVisible(true);	
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					// TODO Auto-generated method stub
-					
 				}
-				
 			});
 			
 			reservationButton.addActionListener(new ActionListener(){
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
+					JPanel resDatePanel = new JPanel();
+					btcSubFrame.add(resDatePanel);
+					JTextField rDate = new JTextField("YYYY-MM-DD", 20);
+					JLabel startLabel = new JLabel("start");
+					JTextField start = new JTextField("24:00", 10);
+					JLabel endLabel = new JLabel("start");
+					JTextField end = new JTextField("24:00", 10);
+					JButton createReserve = new JButton("Create a reservation");
+					resDatePanel.add(rDate);
+					resDatePanel.add(startLabel);
+					resDatePanel.add(start);
+					resDatePanel.add(endLabel);
+					resDatePanel.add(end);
+					resDatePanel.add(createReserve);
+					
+					SwingUtilities.updateComponentTreeUI(btcSubFrame);
+					
+					rDate.addActionListener(new ActionListener(){
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							JTextField o = (JTextField)e.getSource();
+				    		reservationDate = o.getText();
+							
+						}
+						
+					});
+					
+					start.addActionListener(new ActionListener(){
+						@Override
+						public void actionPerformed(ActionEvent e) {			
+							JTextField o = (JTextField)e.getSource();
+				    		rStartTime = o.getText();
+						}
+					});
+					
+					end.addActionListener(new ActionListener(){
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							JTextField o = (JTextField)e.getSource();
+				    		rEndTime = o.getText();
+						}
+					});
+					
+					createReserve.addActionListener(new ActionListener(){
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								boolean createdReservation = q.createReservation(customer.getCid(), reserveCourtId, reservationDate, rStartTime, rEndTime);
+								if (createdReservation) {
+									System.out.println("Success!");
+									btcSubFrame.setVisible(false);
+									btcSubFrame.dispose();
+									bookTennisCourtSubFrame();
+								} else{
+									System.out.println("Fail!");
+								}
+								return;
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+						}
+					});
+					
 					
 				}
 				

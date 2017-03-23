@@ -249,6 +249,27 @@ public class QueryFacade
 	 * Returns true if the delete was successful. Returns false if no row matched
 	 * the given info.
 	 */
+	public boolean createReservation(String cid, String courtid, String rDate, String start, String end) throws SQLException
+	{
+		
+		String query = "INSERT INTO Reserve values ('"+cid+"','"+courtid+"','"+rDate+"',TO_DATE('"+start+"','hh24:mi:ss'),TO_DATE('"+end+"','hh24:mi:ss'))";
+		System.out.println(query);
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	/*
+	 * Deletes a reservation for the given cid and courtid.
+	 * Returns true if the delete was successful. Returns false if no row matched
+	 * the given info.
+	 */
 	public boolean deleteReservation(String cid, int courtid) throws SQLException
 	{
 		String query = "DELETE FROM Reserve r "
