@@ -365,6 +365,23 @@ public class QueryFacade
 		return true;
 	}
 	
+	public boolean updateCustomerCard(String cid, String ccnumber) throws SQLException
+	{
+		String query = "UPDATE Customer "
+				+ "SET CCNumber = '" + ccnumber
+				+ "' WHERE cid = " + cid;
+		
+		Statement s = conn.createStatement();
+		int rowsChanged = s.executeUpdate(query);
+		
+		if (rowsChanged <= 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
 	/*
 	 * Update the phone of the customer with the given cid. Returns
 	 * true if successful. Returns false if no customer with cid exists.
@@ -394,7 +411,7 @@ public class QueryFacade
 	{
 		String query = "UPDATE Customer "
 				+ "SET Address = '" + address
-				+ " WHERE cid = " + cid;
+				+ "' WHERE cid = '" + cid +"'";
 		
 		Statement s = conn.createStatement();
 		int rowsChanged = s.executeUpdate(query);
@@ -417,7 +434,7 @@ public class QueryFacade
 	public boolean updateCustomerAge(String cid, int age) throws SQLException
 	{
 		String query = "UPDATE Customer "
-				+ "SET Age = " + age
+				+ "SET Age = '" + age
 				+ "' WHERE cid = " + cid;
 		
 		Statement s = conn.createStatement();

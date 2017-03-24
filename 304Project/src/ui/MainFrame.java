@@ -928,6 +928,7 @@ public class MainFrame extends JFrame implements ActionListener{
         phone.addActionListener(updateCustPhone);
         address.addActionListener(updateCustAddress);
         age.addActionListener(updateCustAge);
+        ccnumber.addActionListener(updateCustCard);
         
         // adding text fields into control panel and then into update frame
         frame.add(updateLabel);
@@ -948,9 +949,9 @@ public class MainFrame extends JFrame implements ActionListener{
         			System.out.println("Error while updating");
         			err.printStackTrace();
         		}
-        		produceCustomerFrame();
         		frame.setVisible(false);
         		frame.dispose();
+        		produceCustomerFrame();
         	}
         });
     }
@@ -966,6 +967,26 @@ public class MainFrame extends JFrame implements ActionListener{
     				System.out.println("sometihng is wrong");
     			}
     			q.updateCustomerName(customer.getCid(), custName);
+    			customer.setName(custName);
+    		}catch(Exception err){
+    			System.out.println("something went wrong while updating customer name");
+    			err.printStackTrace();
+    		}
+    		
+        }
+    };
+    
+    ActionListener updateCustCard = new ActionListener(){
+    	@Override
+        public void actionPerformed(ActionEvent e) {
+    		JTextField o = (JTextField)e.getSource();
+    		String card = o.getText();
+    		try{
+    			if(q == null) {
+    				System.out.println("sometihng is wrong");
+    			}
+    			q.updateCustomerCard(customer.getCid(), card);
+    			customer.setCcNumber(card);
     		}catch(Exception err){
     			System.out.println("something went wrong while updating customer name");
     			err.printStackTrace();
@@ -997,6 +1018,7 @@ public class MainFrame extends JFrame implements ActionListener{
     		String custAddress = o.getText();
     		try{
     			q.updateCustomerAddress(customer.getCid(), custAddress);
+    			customer.setAddress(custAddress);
     		}catch(Exception err){
     			System.out.println("something went wrong while updating customer address");
     			err.printStackTrace();
@@ -1011,6 +1033,7 @@ public class MainFrame extends JFrame implements ActionListener{
     		String age = o.getText();
     		try{
     			q.updateCustomerAge(customer.getCid(), Integer.parseInt(age));
+    			customer.setAge(age);
     		}catch(Exception err){
     			System.out.println("something went wrong while updating customer age");
     			err.printStackTrace();

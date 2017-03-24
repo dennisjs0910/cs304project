@@ -40,6 +40,19 @@ public class Customer {
 		return cid;
 	}
 	
+	public void setName(String name){
+		this.name = name;
+	}
+	public void setAge(String age){
+		this.age = Integer.parseInt(age);
+	}
+	public void setAddress(String address){
+		this.address = address;
+	}
+	public void setCcNumber(String ccnumber){
+		this.ccnumber = ccnumber;
+	}
+	
 	public void setPhone(String phone){
 		this.phone = phone;
 	}
