@@ -270,10 +270,10 @@ public class QueryFacade
 	 * Returns true if the delete was successful. Returns false if no row matched
 	 * the given info.
 	 */
-	public boolean deleteReservation(String cid, int courtid) throws SQLException
+	public boolean deleteReservation(String cid, String cancelCourtId) throws SQLException
 	{
 		String query = "DELETE FROM Reserve r "
-				+ "WHERE r.cid = " + cid + " AND r.courtid = " + courtid;
+				+ "WHERE r.cid = " + cid + " AND r.courtid = " + cancelCourtId;
 		
 		Statement s = conn.createStatement();
 		int rowsChanged = s.executeUpdate(query);
@@ -576,6 +576,27 @@ public class QueryFacade
 		s.close();
 		
 		return reservationDates;
+	}
+	
+	
+	public boolean customerReserved(String cid, String courtId) throws SQLException {
+		String query = "SELECT COUNT(*) " +
+					   "FROM Reserve r " +
+					   "WHERE r.cid = " + cid +
+					   "AND r.courtid = " + courtId;
+		
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			int count = Integer.parseInt(rs.getString(1));
+			if (count <= 0) {
+				return false;
+			}
+			
+		}
+		s.close();
+		return true;
 	}
 	
 }

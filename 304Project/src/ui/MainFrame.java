@@ -52,6 +52,7 @@ public class MainFrame extends JFrame implements ActionListener{
     
     private String lessonId;
     private String reserveCourtId;
+    private String cancelCourtId;
     private String reservationDate;
     private String rStartTime;
     private String rEndTime;
@@ -576,6 +577,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
     //Customer book tennis court sub frame.
     private void bookTennisCourtSubFrame(){
+    	reserveCourtId= "";
         final JFrame btcSubFrame = createSubFrame();
         final JPanel btcControlPanel = new JPanel();
         btcControlPanel.setLayout(new FlowLayout());
@@ -603,9 +605,11 @@ public class MainFrame extends JFrame implements ActionListener{
 			btcSubFrame.add(scrollPane);
 			
 			JButton showReservationButton = new JButton("Show Reservation");
+			JButton deleteReservation = new JButton("Cancel a Reservation");
 			final JButton reservationButton = new JButton("Reserve Court");
 			btcSubFrame.add(showReservationButton);
 			btcSubFrame.add(reservationButton);
+			btcSubFrame.add(deleteReservation);
 			btcSubFrame.setVisible(true);
 			reserveTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 		        public void valueChanged(ListSelectionEvent event) {
@@ -632,6 +636,9 @@ public class MainFrame extends JFrame implements ActionListener{
 					reserveHeader.setSize(50,50);
 					panel.add(reserveHeader);
 					try {
+						if (reserveCourtId == null|| reserveCourtId == ""){
+							return;
+						}
 						System.out.println("Search " + reserveCourtId);
 						List<Date[]> dates =  q.getCourtReservation(reserveCourtId);
 						if (dates.size() == 0) {
@@ -664,7 +671,7 @@ public class MainFrame extends JFrame implements ActionListener{
 					JTextField rDate = new JTextField("YYYY-MM-DD", 20);
 					JLabel startLabel = new JLabel("start");
 					JTextField start = new JTextField("24:00", 10);
-					JLabel endLabel = new JLabel("start");
+					JLabel endLabel = new JLabel("end");
 					JTextField end = new JTextField("24:00", 10);
 					JButton createReserve = new JButton("Create a reservation");
 					resDatePanel.add(rDate);
@@ -682,6 +689,7 @@ public class MainFrame extends JFrame implements ActionListener{
 							// TODO Auto-generated method stub
 							JTextField o = (JTextField)e.getSource();
 				    		reservationDate = o.getText();
+				    		System.out.println(reservationDate);
 							
 						}
 						
@@ -692,6 +700,7 @@ public class MainFrame extends JFrame implements ActionListener{
 						public void actionPerformed(ActionEvent e) {			
 							JTextField o = (JTextField)e.getSource();
 				    		rStartTime = o.getText();
+				    		System.out.println(rStartTime);
 						}
 					});
 					
@@ -701,6 +710,7 @@ public class MainFrame extends JFrame implements ActionListener{
 						public void actionPerformed(ActionEvent e) {
 							JTextField o = (JTextField)e.getSource();
 				    		rEndTime = o.getText();
+				    		System.out.println(rEndTime);
 						}
 					});
 					
@@ -725,11 +735,74 @@ public class MainFrame extends JFrame implements ActionListener{
 							
 						}
 					});
-					
-					
 				}
-				
 			});
+			
+			
+			deleteReservation.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JFrame cancelFrame = createSubFrame();
+					List<ReservableTennisCourt> reserved = null;
+					try {
+						reserved = q.getReservableTennisCourts();
+					
+					if (reserved == null ||reserved.isEmpty()){
+						return;
+					}
+					String[] columnNames = {"CourtId", "Surface", "CentreId"};
+					JPanel reservePanel = new JPanel();
+					reservePanel.setLayout(new BoxLayout(reservePanel, BoxLayout.PAGE_AXIS));
+					Object[][] data = new Object[reserved.size()][4];
+					int i = 0;
+					
+					for(ReservableTennisCourt court: reserved){
+						if (q.customerReserved(customer.getCid(), court.getCourtId())){
+				        	String[] info = {court.getCourtId(), court.getSurface(), court.getCentreId()};
+				        	data[i] = info;
+				        	i++;
+						}
+			        }
+					
+					final JTable reservedTable = new JTable(data, columnNames);
+					JScrollPane scrollPane = new JScrollPane(reservedTable);
+					cancelFrame.add(scrollPane);
+					
+					JButton cancel = new JButton("Cancel");
+					cancelFrame.add(cancel);
+					cancelFrame.setVisible(true);
+					reservedTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+				        public void valueChanged(ListSelectionEvent event) {
+				        	cancelCourtId = reservedTable.getValueAt(reservedTable.getSelectedRow(), 0).toString();
+				        }
+				    });
+					
+					cancel.addActionListener(new ActionListener(){
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								q.deleteReservation(customer.getCid(), cancelCourtId);
+								btcSubFrame.setVisible(false);
+								btcSubFrame.dispose();
+								bookTennisCourtSubFrame();
+							} catch (SQLException err) {
+								// TODO Auto-generated catch block
+								err.printStackTrace();
+							}
+							
+						}
+						
+					});
+					
+				}catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			  }
+			});
+			
+			
         } catch (SQLException e1) {
 			System.out.println("Something went wrong while loading ReservableTennisCourt");
 			e1.printStackTrace();
