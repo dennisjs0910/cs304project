@@ -16,6 +16,7 @@ import row.AggregationLessonCountRow;
 import row.AggregationLessonAvgAgeRow;
 import row.NestedAggregationRow;
 import row.DivisionCourtRow;
+import row.DivisionCoachRow;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -147,17 +148,9 @@ public class MainFrame extends JFrame implements ActionListener{
     public void produceEmployeeFrame(){
         newFrame();
         headerLabel.setText("Welcome Employee" + EmployeeID);
-        //Button for updateEmployee Frame
-        JButton updateEmployeeInfoButton = new JButton("Update Personal Info");
-        controlPanel.add(updateEmployeeInfoButton);
-        updateEmployeeInfoButton.addActionListener(new ActionListener(){
-        	@Override
-        	public void actionPerformed(ActionEvent e){
-        		createUpdateEmployeeFrame();
-        	}
-        });
+        
       //Button for update lessons Frame
-        JButton employeeLessonsButton = new JButton("Add Lessons");
+        JButton employeeLessonsButton = new JButton("See Lesson Information");
         controlPanel.add(employeeLessonsButton);
         employeeLessonsButton.addActionListener(new ActionListener(){
         	@Override
@@ -166,7 +159,7 @@ public class MainFrame extends JFrame implements ActionListener{
         	}
         });
       //Button for update courts Frame
-        JButton employeecourtsButton = new JButton("Add Courts");
+        JButton employeecourtsButton = new JButton("See court booking information");
         controlPanel.add(employeecourtsButton);
         employeecourtsButton.addActionListener(new ActionListener(){
         	@Override
@@ -202,20 +195,6 @@ public class MainFrame extends JFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 createHomeFrame();
-            }
-        });
-    }
-    //Frame for updating employee personal info
-    private void createUpdateEmployeeFrame(){
-    	newFrame();
-    	headerLabel.setText("Update Employee" + EmployeeID);
-    	//back button 
-        JButton goBack = new JButton("back");
-        controlPanel.add(goBack);
-        goBack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	produceEmployeeFrame();
             }
         });
     }
@@ -347,7 +326,9 @@ public class MainFrame extends JFrame implements ActionListener{
     	final JFrame main = createSubFrame();
     	main.setVisible(true);
     	JPanel panel = new JPanel();
-    	main.add(panel);
+    	JScrollPane outerScroll = new JScrollPane(panel);
+    	outerScroll.setPreferredSize(new Dimension(800, 700));
+    	main.add(outerScroll);
     	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     	panel.add(new JLabel("Search Employees"));
@@ -434,7 +415,63 @@ public class MainFrame extends JFrame implements ActionListener{
 		}
         
         panel.add(coachesPanel);
+    
+  //Division Coach Row
+	JPanel divisionCoachPanel = new JPanel();
+	divisionCoachPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+	divisionCoachPanel.setLayout(new BoxLayout(divisionCoachPanel, BoxLayout.Y_AXIS));
+   
+    JLabel divisionCoachLabel = new JLabel("Coaches teaching all lessons of a level:");
+    divisionCoachPanel.add(divisionCoachLabel);
+    String[] levelList = {"Novice", "Intermediate", "Advanced"};
+	final JComboBox<String> levelComboBox = new JComboBox<String>(levelList);
+	divisionCoachPanel.add(levelComboBox);
+	//Combobox listener
+	levelComboBox.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JComboBox combo = (JComboBox)e.getSource();
+            String level = (String)combo.getSelectedItem();
+            System.out.println(level);
+        }
+    });
+    try{
+    	List<DivisionCoachRow> DivisionRow = q.getDivisionCoaches(String.valueOf(levelComboBox.getSelectedIndex() + 1));
+    	String[] columnNames = {"Coach Name", "Coach Phone Number"};
+    	final Object[][] data = new Object[DivisionRow.size()][2];
+		int i=0;
+		for(DivisionCoachRow row: DivisionRow){
+        	String[] info = { row.getName(), row.getPhone()};
+        	data[i] = info;
+        	i++;
+        }
+		final JTable DivisionCoachTable = new JTable(data,columnNames);
+		DivisionCoachTable.setPreferredSize(new Dimension(600, 100));
+		JScrollPane scrollPane = new JScrollPane(DivisionCoachTable);
+		scrollPane.setPreferredSize(new Dimension(600, 100));
+		divisionCoachPanel.add(scrollPane);
+    } catch (SQLException e){
+    	System.out.println("Problem retrieving division coaches");
+		e.printStackTrace();
     }
+    
+    
+    panel.add(divisionCoachPanel);
+    
+	//close button 
+    JButton close = new JButton("Close");
+    panel.add(close);
+    close.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+        	main.setVisible(false);
+        }
+    });
+    }
+    
+    
+    
+    
     // Frame for employees to search for customers
     private void createCustomerSearchFrame() {
     	final JFrame main = createSubFrame();
@@ -815,7 +852,7 @@ public class MainFrame extends JFrame implements ActionListener{
         JPanel elControlPanel = new JPanel();
         elControlPanel.setLayout(new FlowLayout());
         elSubFrame.add(new JLabel("Search and Enroll in a lesson"));
-        elSubFrame.add(new JLabel("Select you level"));
+        elSubFrame.add(new JLabel("Select your level"));
         final JComboBox<String> levelComboBox = new JComboBox<String>(levelList);
         levelComboBox.setVisible(true);
         elControlPanel.add(levelComboBox);
