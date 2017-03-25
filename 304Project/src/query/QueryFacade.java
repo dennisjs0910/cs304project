@@ -197,6 +197,51 @@ public class QueryFacade
 		return rows;
 	}
 	
+	public List<AggregationLessonAgeRow> getNestedAggregationAgeLesson(String agg, String nestedAgg) throws SQLException
+	{
+		String view = "create view nested (aggAge, lid, l_level) as SELECT " +  agg + "(c.age) as aggAge, l.lid, l.l_level "
+				+ "FROM Lesson l, Enrolled_In e, Customer c "
+				+ "WHERE l.lid = e.lid AND e.cid = c.cid "
+				+ "GROUP BY l.lid, l.l_level";
+
+		List<AggregationLessonAgeRow> rows = new ArrayList<AggregationLessonAgeRow>();
+		
+		Statement s = conn.createStatement();
+		try
+		{
+			s.executeQuery("drop view nested");
+		}
+		catch (SQLException e)
+		{
+			System.out.println("view already dropped");
+		}
+		s.executeQuery(view);
+		
+		
+		String query = "SELECT aggAge, lid, l_level FROM nested t WHERE t.aggAge = (SELECT " + nestedAgg + "(aggAge) FROM nested)";
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			int avgAge = rs.getInt(1);
+			String lid = rs.getString(2);
+			String level = rs.getString(3);
+			
+			AggregationLessonAgeRow row = new AggregationLessonAgeRow(avgAge, lid, level);
+			rows.add(row);
+		}
+		try
+		{
+			s.executeQuery("drop view nested");
+		}
+		catch (SQLException e)
+		{
+			System.out.println("view already dropped");
+		}
+		
+		s.close();
+		return rows;
+	}
+	
 	// Nested aggregation: Find the customer(s) with the max/min number of court reservations of any customer
 	public List<NestedAggregationRow> getNestedAggregation(String minMax) throws SQLException
 	{

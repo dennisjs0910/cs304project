@@ -155,7 +155,7 @@ public class MainFrame extends JFrame implements ActionListener{
         employeeLessonsButton.addActionListener(new ActionListener(){
         	@Override
         	public void actionPerformed(ActionEvent e){
-        		createEmployeeLessonsFrame("AVG");
+        		createEmployeeLessonsFrame("AVG", "MAX");
         	}
         });
       //Button for update courts Frame
@@ -199,7 +199,7 @@ public class MainFrame extends JFrame implements ActionListener{
         });
     }
     // Frame for employees to update lesson information
-    private void createEmployeeLessonsFrame(String agg) {
+    private void createEmployeeLessonsFrame(String agg, String nestedAgg) {
     	final JFrame main = createSubFrame();
     	main.setVisible(true);
     	JPanel panel = new JPanel();
@@ -244,12 +244,13 @@ public class MainFrame extends JFrame implements ActionListener{
         final JComboBox<String> aggComboBox = new JComboBox<String>(aggList);
         aggComboBox.setSelectedItem(agg);
         aggComboBox.setVisible(true);
-        JLabel lessonAgeLabel = new JLabel(" age of Students Enrolled:");
+        JLabel lessonAgeLabel = new JLabel(" age of Students Enrolled for each Lesson:");
         JPanel selectionPanel = new JPanel();
         selectionPanel.setLayout(new FlowLayout());
         selectionPanel.add(aggComboBox);
         selectionPanel.add(lessonAgeLabel);
         lessonAgePanel.add(selectionPanel);
+        
         
         //lessonAgePanel.add(lessonAgeLabel);
         try{
@@ -273,6 +274,45 @@ public class MainFrame extends JFrame implements ActionListener{
 			e.printStackTrace();
         }
         panel.add(lessonAgePanel);
+
+        JLabel lessonNestedLabel = new JLabel("The ");
+        String[] nestedAggList = {"MAX", "MIN"};
+        final JComboBox<String> nestedAggComboBox = new JComboBox<String>(nestedAggList);
+        nestedAggComboBox.setSelectedItem(nestedAgg);
+        JLabel afterLabel = new JLabel("of these ages:");
+        JPanel nestedSelectionPanel = new JPanel(new FlowLayout());
+        nestedSelectionPanel.add(lessonNestedLabel);
+        nestedSelectionPanel.add(nestedAggComboBox);
+        nestedSelectionPanel.add(afterLabel);
+        JPanel nestedAggPanel = new JPanel();
+        nestedAggPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        nestedAggPanel.setLayout(new BoxLayout(nestedAggPanel, BoxLayout.Y_AXIS));
+        nestedAggPanel.add(nestedSelectionPanel);
+        
+        try{
+        	List<AggregationLessonAgeRow> nestedRows = q.getNestedAggregationAgeLesson((String) aggComboBox.getSelectedItem(), (String) nestedAggComboBox.getSelectedItem());
+        	String[] columnNames = {aggComboBox.getSelectedItem() + " Age of Students", "Lesson ID", "Lesson Level"};
+        	final Object[][] data = new Object[nestedRows.size()][3];
+
+			int i=0;
+			for(AggregationLessonAgeRow row: nestedRows){
+	        	String[] info = { String.valueOf(row.getAverageAge()), row.getLID(), row.getLevel()};
+	        	data[i] = info;
+	        	i++;
+	        }
+			final JTable nestedAggregateLessonAgeTable = new JTable(data,columnNames);
+			nestedAggregateLessonAgeTable.setPreferredSize(new Dimension(400, 100));
+			JScrollPane scrollPane = new JScrollPane(nestedAggregateLessonAgeTable);
+			scrollPane.setPreferredSize(new Dimension(400, 100));
+			nestedAggPanel.add(scrollPane);
+        } catch (SQLException e){
+        	System.out.println("Problem retrieving aggregation lesson age");
+			e.printStackTrace();
+        }
+        
+        
+        panel.add(nestedAggPanel);
+        
       //close button 
         JButton close = new JButton("Close");
         panel.add(close);
@@ -288,7 +328,16 @@ public class MainFrame extends JFrame implements ActionListener{
             public void actionPerformed(ActionEvent e) {
             	String selected = (String) aggComboBox.getSelectedItem();
 				main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
-	            createEmployeeLessonsFrame(selected);
+	            createEmployeeLessonsFrame(selected, (String) nestedAggComboBox.getSelectedItem());
+            }
+        });
+        
+        nestedAggComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	String selected = (String) nestedAggComboBox.getSelectedItem();
+				main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
+	            createEmployeeLessonsFrame((String) aggComboBox.getSelectedItem(), selected);
             }
         });
         
