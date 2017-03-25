@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import row.AggregationLessonAvgAgeRow;
+import row.AggregationLessonAgeRow;
 import row.AggregationLessonCountRow;
 import row.Coach;
 import row.Customer;
@@ -172,15 +172,15 @@ public class QueryFacade
 		return rows;
 	}
 	
-	// Aggregation: Find the average age of students registered in each lesson.
-	public List<AggregationLessonAvgAgeRow> getAggregationAvgAgeLesson() throws SQLException
+	// Aggregation: Find the average/max/min age of students registered in each lesson.
+	public List<AggregationLessonAgeRow> getAggregationAgeLesson(String agg) throws SQLException
 	{
-		String query = "SELECT avg(c.age), l.lid, l.l_level "
+		String query = "SELECT " +  agg + "(c.age), l.lid, l.l_level "
 				+ "FROM Lesson l, Enrolled_In e, Customer c "
 				+ "WHERE l.lid = e.lid AND e.cid = c.cid "
 				+ "GROUP BY l.lid, l.l_level";
 
-		List<AggregationLessonAvgAgeRow> rows = new ArrayList<AggregationLessonAvgAgeRow>();
+		List<AggregationLessonAgeRow> rows = new ArrayList<AggregationLessonAgeRow>();
 		
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
@@ -190,7 +190,7 @@ public class QueryFacade
 			String lid = rs.getString(2);
 			String level = rs.getString(3);
 			
-			AggregationLessonAvgAgeRow row = new AggregationLessonAvgAgeRow(avgAge, lid, level);
+			AggregationLessonAgeRow row = new AggregationLessonAgeRow(avgAge, lid, level);
 			rows.add(row);
 		}
 		s.close();

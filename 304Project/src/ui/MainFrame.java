@@ -13,7 +13,7 @@ import row.Employee;
 import row.LessonReportRow;
 import row.ReservableTennisCourt;
 import row.AggregationLessonCountRow;
-import row.AggregationLessonAvgAgeRow;
+import row.AggregationLessonAgeRow;
 import row.NestedAggregationRow;
 import row.DivisionCourtRow;
 import row.DivisionCoachRow;
@@ -155,7 +155,7 @@ public class MainFrame extends JFrame implements ActionListener{
         employeeLessonsButton.addActionListener(new ActionListener(){
         	@Override
         	public void actionPerformed(ActionEvent e){
-        		createEmployeeLessonsFrame();
+        		createEmployeeLessonsFrame("AVG");
         	}
         });
       //Button for update courts Frame
@@ -199,7 +199,7 @@ public class MainFrame extends JFrame implements ActionListener{
         });
     }
     // Frame for employees to update lesson information
-    private void createEmployeeLessonsFrame() {
+    private void createEmployeeLessonsFrame(String agg) {
     	final JFrame main = createSubFrame();
     	main.setVisible(true);
     	JPanel panel = new JPanel();
@@ -239,16 +239,21 @@ public class MainFrame extends JFrame implements ActionListener{
         JPanel lessonAgePanel = new JPanel();
         lessonAgePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         lessonAgePanel.setLayout(new BoxLayout(lessonAgePanel, BoxLayout.Y_AXIS));
-       
-        JLabel lessonAgeLabel = new JLabel("Average age of Students Enrolled:");
+
+        String[] aggList= {"MAX", "MIN", "AVG"};
+        final JComboBox<String> aggComboBox = new JComboBox<String>(aggList);
+        aggComboBox.setSelectedItem(agg);
+        aggComboBox.setVisible(true);
+        lessonAgePanel.add(aggComboBox);
+        JLabel lessonAgeLabel = new JLabel(" age of Students Enrolled:");
         lessonAgePanel.add(lessonAgeLabel);
         try{
-        	List<AggregationLessonAvgAgeRow> lessonAgeRow = q.getAggregationAvgAgeLesson();
-        	String[] columnNames = {"Average Age of Students", "Lesson ID", "Lesson Level"};
+        	List<AggregationLessonAgeRow> lessonAgeRow = q.getAggregationAgeLesson((String) aggComboBox.getSelectedItem());
+        	String[] columnNames = {aggComboBox.getSelectedItem() + " Age of Students", "Lesson ID", "Lesson Level"};
         	final Object[][] data = new Object[lessonAgeRow.size()][3];
 
 			int i=0;
-			for(AggregationLessonAvgAgeRow row: lessonAgeRow){
+			for(AggregationLessonAgeRow row: lessonAgeRow){
 	        	String[] info = { String.valueOf(row.getAverageAge()), row.getLID(), row.getLevel()};
 	        	data[i] = info;
 	        	i++;
@@ -272,6 +277,16 @@ public class MainFrame extends JFrame implements ActionListener{
             	main.setVisible(false);
             }
         });
+        
+        aggComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	String selected = (String) aggComboBox.getSelectedItem();
+				main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
+	            createEmployeeLessonsFrame(selected);
+            }
+        });
+        
     }
     // Frame for employees to update court information
     private void createEmployeeCourtsFrame() {

@@ -1,12 +1,12 @@
 package row;
 
-public class AggregationLessonAvgAgeRow {
+public class AggregationLessonAgeRow {
 	
 	private int avgAge;
 	private String lid;
 	private String level;
 	
-	public AggregationLessonAvgAgeRow(int avgAge, String lid, String level)
+	public AggregationLessonAgeRow(int avgAge, String lid, String level)
 	{
 		this.avgAge = avgAge;
 		this.lid = lid;
