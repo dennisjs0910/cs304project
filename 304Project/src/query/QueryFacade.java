@@ -197,18 +197,20 @@ public class QueryFacade
 		return rows;
 	}
 	
-	// Nested aggregation: Find the customer(s) with the max number of court reservations of any customer
-	public List<NestedAggregationRow> getNestedAggregation() throws SQLException
+	// Nested aggregation: Find the customer(s) with the max/min number of court reservations of any customer
+	public List<NestedAggregationRow> getNestedAggregation(String minMax) throws SQLException
 	{
-		String query = "SELECT c.cid, c.name, count(*)"
-				+ "FROM Reserve r, Customer c "
-				+ "WHERE r.cid = c.cid "
-				+ "GROUP BY c.cid, c.name "
-				+ "HAVING COUNT(*) >= ALL (SELECT Count(*) FROM Reserve r2, Customer c2 WHERE r2.cid = c2.cid AND c.cid != c2.cid GROUP BY c2.cid, c.name)";
+		String view = "create view temp(cid, name, numRes) as select c.cid, c.name, count(*) as numRes FROM Reserve r, Customer c WHERE r.cid=c.cid group by c.cid, c.name";
 
+		Statement s = conn.createStatement();
+		s.executeQuery(view);
+		
+		String query = "select Temp.cid, Temp.name, Temp.numRes FROM Temp WHERE Temp.numRes = (SELECT " + minMax + "(Temp.numRes) FROM Temp)";
+
+		System.out.println("Executing temp query");
+		
 		List<NestedAggregationRow> rows = new ArrayList<NestedAggregationRow>();
 		
-		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
 		while (rs.next())
 		{
@@ -219,6 +221,9 @@ public class QueryFacade
 			NestedAggregationRow row = new NestedAggregationRow(cid, cname, numReservations);
 			rows.add(row);
 		}
+		System.out.println("Dropping view");
+		s.executeQuery("Drop view temp");
+		
 		s.close();
 		return rows;
 	}

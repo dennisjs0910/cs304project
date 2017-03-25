@@ -172,6 +172,7 @@ insert into Reserve values ('121234','000000009','2017-02-19',TO_DATE('9:00:00',
 insert into Reserve values ('121237','000000008','2017-02-19',TO_DATE('9:00:00','hh24:mi:ss'),TO_DATE('11:00:00','hh24:mi:ss'));
 insert into Reserve values ('121247','000000007','2017-02-22',TO_DATE('11:00:00','hh24:mi:ss'),TO_DATE('12:30:00','hh24:mi:ss'));
 insert into Reserve values ('121244','000000010','2017-02-22',TO_DATE('13:00:00','hh24:mi:ss'),TO_DATE('15:00:00','hh24:mi:ss'));
+insert into Reserve values ('121244','000000007','2017-02-23',TO_DATE('13:00:00','hh24:mi:ss'),TO_DATE('15:00:00','hh24:mi:ss'));
 
 
 select TO_CHAR(TO_DATE('16:18:14', 'hh24:mi:ss'), 'hh24:mi:ss') from customer;   

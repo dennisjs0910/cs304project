@@ -164,7 +164,7 @@ public class MainFrame extends JFrame implements ActionListener{
         employeecourtsButton.addActionListener(new ActionListener(){
         	@Override
         	public void actionPerformed(ActionEvent e){
-        		createEmployeeCourtsFrame();
+        		createEmployeeCourtsFrame("most");
         	}
         });
         
@@ -235,7 +235,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			e.printStackTrace();
         }
         panel.add(lessonCountPanel);
-        //Average lesson age query
+        //Aggregation lesson age query
         JPanel lessonAgePanel = new JPanel();
         lessonAgePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         lessonAgePanel.setLayout(new BoxLayout(lessonAgePanel, BoxLayout.Y_AXIS));
@@ -244,9 +244,14 @@ public class MainFrame extends JFrame implements ActionListener{
         final JComboBox<String> aggComboBox = new JComboBox<String>(aggList);
         aggComboBox.setSelectedItem(agg);
         aggComboBox.setVisible(true);
-        lessonAgePanel.add(aggComboBox);
         JLabel lessonAgeLabel = new JLabel(" age of Students Enrolled:");
-        lessonAgePanel.add(lessonAgeLabel);
+        JPanel selectionPanel = new JPanel();
+        selectionPanel.setLayout(new FlowLayout());
+        selectionPanel.add(aggComboBox);
+        selectionPanel.add(lessonAgeLabel);
+        lessonAgePanel.add(selectionPanel);
+        
+        //lessonAgePanel.add(lessonAgeLabel);
         try{
         	List<AggregationLessonAgeRow> lessonAgeRow = q.getAggregationAgeLesson((String) aggComboBox.getSelectedItem());
         	String[] columnNames = {aggComboBox.getSelectedItem() + " Age of Students", "Lesson ID", "Lesson Level"};
@@ -289,7 +294,7 @@ public class MainFrame extends JFrame implements ActionListener{
         
     }
     // Frame for employees to update court information
-    private void createEmployeeCourtsFrame() {
+    private void createEmployeeCourtsFrame(String agg) {
     	final JFrame main = createSubFrame();
     	main.setVisible(true);
     	JPanel panel = new JPanel();
@@ -301,11 +306,29 @@ public class MainFrame extends JFrame implements ActionListener{
         JPanel maxReservationsPanel = new JPanel();
         maxReservationsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         maxReservationsPanel.setLayout(new BoxLayout(maxReservationsPanel, BoxLayout.Y_AXIS));
-       
-        JLabel maxReservationsLabel = new JLabel("Customer with the most reservations:");
-        maxReservationsPanel.add(maxReservationsLabel);
+        
+        String[] aggList= {"most", "least"};
+        final JComboBox<String> aggComboBox = new JComboBox<String>(aggList);
+        aggComboBox.setSelectedItem(agg);
+        aggComboBox.setVisible(true);
+        JLabel firstLabel = new JLabel("Of customers who have made reservations, show the customer(s) with the ");
+        JPanel selectionPanel = new JPanel();
+        selectionPanel.setLayout(new FlowLayout());
+        selectionPanel.add(firstLabel);
+        selectionPanel.add(aggComboBox);
+        selectionPanel.add(new JLabel(" number of reservations"));
+        maxReservationsPanel.add(selectionPanel);
         try{
-        	List<NestedAggregationRow> NestedRow = q.getNestedAggregation();
+        	String maxMin = "";
+        	if (aggComboBox.getSelectedItem().equals("most"))
+        	{
+        		maxMin = "MAX";
+        	}
+        	else
+        	{
+        		maxMin = "MIN";
+        	}
+        	List<NestedAggregationRow> NestedRow = q.getNestedAggregation(maxMin);
         	String[] columnNames = {"Customer ID", "Customer Name", "Number of Reservations"};
         	final Object[][] data = new Object[NestedRow.size()][3];
 
@@ -332,6 +355,15 @@ public class MainFrame extends JFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
             	main.setVisible(false);
+            }
+        });
+        
+        aggComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	String selected = (String) aggComboBox.getSelectedItem();
+				main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
+	            createEmployeeCourtsFrame(selected);
             }
         });
     }
