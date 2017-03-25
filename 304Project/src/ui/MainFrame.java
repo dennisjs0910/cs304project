@@ -441,7 +441,9 @@ public class MainFrame extends JFrame implements ActionListener{
     String[] levelList = {"Novice", "Intermediate", "Advanced"};
 	final JComboBox<String> levelComboBox = new JComboBox<String>(levelList);
 	divisionCoachPanel.add(levelComboBox);
-	//Combobox listener
+	
+	/*Combobox listener
+	
 	levelComboBox.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -450,6 +452,7 @@ public class MainFrame extends JFrame implements ActionListener{
             System.out.println(level);
         }
     });
+    */
     try{
     	List<DivisionCoachRow> DivisionRow = q.getDivisionCoaches(String.valueOf(levelComboBox.getSelectedIndex() + 1));
     	String[] columnNames = {"Coach Name", "Coach Phone Number"};
