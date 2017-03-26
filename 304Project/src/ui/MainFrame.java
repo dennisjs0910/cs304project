@@ -150,7 +150,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
     public void produceEmployeeFrame(){
         newFrame();
-        headerLabel.setText("Welcome Employee " + EmployeeID);
+        headerLabel.setText("Welcome Employee " + admin.getName());
         
       //Button for update lessons Frame
         JButton employeeLessonsButton = new JButton("See Lesson Information");
@@ -1263,8 +1263,15 @@ public class MainFrame extends JFrame implements ActionListener{
 	        			}
 					
 	    		} else if (userType.equals("admin")){
-	    			admin = q.getAdmin(id);
-	    			produceEmployeeFrame();
+	    			admin = q.getAdmin(id, pass);
+	    			if (admin == null){
+	    				JOptionPane wronguserName = new JOptionPane();
+						wronguserName.showMessageDialog(mainFrame, "Username or Password is incorrect");
+	    				System.out.println("Admin does not exist");
+	    			} else {
+	    				produceEmployeeFrame();
+	    			}
+	    			
 	    			/*
 	    			if (customer == null) {
 						System.out.println("Employee does not exist");

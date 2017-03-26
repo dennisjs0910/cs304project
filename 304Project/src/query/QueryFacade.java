@@ -524,10 +524,11 @@ public class QueryFacade
 		return cus;
 	}
 	
-	public Employee getAdmin(String adminSin) throws SQLException {
+	public Employee getAdmin(String adminSin, String ephone) throws SQLException {
 		String query = "SELECT * "
 				+ "FROM EmployeesWorkAt e "
-				+ "WHERE e.sin = " + adminSin;	
+				+ "WHERE e.sin = " + adminSin
+				+ " AND e.phone = " + ephone;
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
 		
