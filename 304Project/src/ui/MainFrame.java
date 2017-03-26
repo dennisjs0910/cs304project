@@ -57,6 +57,7 @@ public class MainFrame extends JFrame implements ActionListener{
     private String reservationDate;
     private String rStartTime;
     private String rEndTime;
+    private String custLessonLevel;
 
     public MainFrame(){
     	q = new QueryFacade(false, "");
@@ -802,9 +803,14 @@ public class MainFrame extends JFrame implements ActionListener{
 			});
 			
 			reservationButton.addActionListener(new ActionListener(){
-
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (reserveCourtId.equals("")){
+						JOptionPane reservationNull = new JOptionPane();
+						reservationNull.showMessageDialog(mainFrame, "Select a Court before making a reservation.");
+						return;
+					}
 					JPanel resDatePanel = new JPanel();
 					btcSubFrame.add(resDatePanel);
 					JTextField rDate = new JTextField("YYYY-MM-DD", 20);
@@ -949,15 +955,15 @@ public class MainFrame extends JFrame implements ActionListener{
     }
 
     private void enrollLessonSubFrame(){
-        String[] levelList = {"Novice", "Intermediate", "Advanced"};
+        //String[] levelList = {"All" ,"Novice", "Intermediate", "Advanced"};
         final JFrame elSubFrame = createSubFrame();
         JPanel elControlPanel = new JPanel();
         elControlPanel.setLayout(new FlowLayout());
         elSubFrame.add(new JLabel("Search and Enroll in a lesson"));
         elSubFrame.add(new JLabel("Select your level"));
-        final JComboBox<String> levelComboBox = new JComboBox<String>(levelList);
-        levelComboBox.setVisible(true);
-        elControlPanel.add(levelComboBox);
+//        final JComboBox<String> levelComboBox = new JComboBox<String>(levelList);
+//        levelComboBox.setVisible(true);
+//        elControlPanel.add(levelComboBox);
         elSubFrame.add(elControlPanel);
         
         try {
@@ -972,11 +978,10 @@ public class MainFrame extends JFrame implements ActionListener{
 				boolean customerEnrolled = q.customerEnrollsIn(customer.getCid(), lrr.getLID());
 				String[] info;
 				if (customerEnrolled) {
-					info = new String[] {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID(), "Enrolled"};
+					info = new String[] {lrr.getLID(), translateLevel(lrr.getLevel()), lrr.getCoachName(), lrr.getCentreID(), "Enrolled"};
 				} else {
-					info = new String[]{lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID(), "Not Enrolled"};
+					info = new String[]{lrr.getLID(), translateLevel(lrr.getLevel()), lrr.getCoachName(), lrr.getCentreID(), "Not Enrolled"};
 				}
-	        	//String[] info = {lrr.getLID(), lrr.getLevel(), lrr.getCoachName(), lrr.getCentreID()};
 	        	data[i] = info;
 	        	i++;
 	        }
@@ -1037,17 +1042,24 @@ public class MainFrame extends JFrame implements ActionListener{
         
         
         // add listeners to text fields and combo box and constantly each field?
-        levelComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JComboBox cb = (JComboBox)e.getSource();
-                String level = (String)cb.getSelectedItem();
-                System.out.println(level);
-            }
-        });
-        
-
-
+//        levelComboBox.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                JComboBox cb = (JComboBox)e.getSource();
+//                custLessonLevel = (String)cb.getSelectedItem();
+//                SwingUtilities.updateComponentTreeUI(elSubFrame);
+//				
+//            }
+//        });
+    }
+    
+    private String translateLevel(String level){
+    	if (level.equals("001")){
+    		return "Novice";
+    	}else if (level.equals("002")){
+    		return "Intermediate";
+    	} 
+    	return "Advanced";
     }
 
     private void custUpdateSubFrame(){
@@ -1071,10 +1083,15 @@ public class MainFrame extends JFrame implements ActionListener{
         
         // adding text fields into control panel and then into update frame
         frame.add(updateLabel);
+        updateControlPanel.add(new JLabel("Name:"));
         updateControlPanel.add(nameText);
+        updateControlPanel.add(new JLabel("Credit Card:"));
         updateControlPanel.add(ccnumber);
+        updateControlPanel.add(new JLabel("Phone"));
         updateControlPanel.add(phone);
+        updateControlPanel.add(new JLabel("Address"));
         updateControlPanel.add(address);
+        updateControlPanel.add(new JLabel("Age"));
         updateControlPanel.add(age);
         updateControlPanel.add(finishUpdateButton);
         frame.add(updateControlPanel);
@@ -1174,6 +1191,9 @@ public class MainFrame extends JFrame implements ActionListener{
     			q.updateCustomerAge(customer.getCid(), Integer.parseInt(age));
     			customer.setAge(age);
     		}catch(Exception err){
+    			JOptionPane tooOld = new JOptionPane();
+    			tooOld.showMessageDialog(mainFrame, "Age Cannot be greater than 120.");
+    			//TODO:
     			System.out.println("something went wrong while updating customer age");
     			err.printStackTrace();
     		}	
