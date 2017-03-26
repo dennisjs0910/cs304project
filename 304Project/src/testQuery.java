@@ -2,7 +2,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import query.QueryFacade;
-import row.AggregationLessonAvgAgeRow;
+import row.AggregationLessonAgeRow;
 import row.AggregationLessonCountRow;
 import row.Customer;
 import row.NestedAggregationRow;

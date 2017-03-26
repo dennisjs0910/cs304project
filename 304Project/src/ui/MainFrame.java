@@ -45,7 +45,7 @@ public class MainFrame extends JFrame implements ActionListener{
     private String userName;
     private String userPassword;
     private AuthenticateUser auth;
-    private int EmployeeID;
+    private String EmployeeID;
     private Customer customer;
     private Employee admin;
     private QueryFacade q;
@@ -63,12 +63,14 @@ public class MainFrame extends JFrame implements ActionListener{
     	try {
 			q.connect();
 			System.out.println("connection!");
+			auth = new AuthenticateUser();
+	        createHomeFrame();
 		} catch(Exception err){ 
 			System.out.println("no connection turn on your server");
-		}
-
-    	auth = new AuthenticateUser();
-        createHomeFrame();
+			JOptionPane noConnectionPopup = new JOptionPane();
+			noConnectionPopup.showMessageDialog(mainFrame, "No Connection");
+			
+		}	
     }
 
     @Override
@@ -147,7 +149,7 @@ public class MainFrame extends JFrame implements ActionListener{
 
     public void produceEmployeeFrame(){
         newFrame();
-        headerLabel.setText("Welcome Employee" + EmployeeID);
+        headerLabel.setText("Welcome Employee " + EmployeeID);
         
       //Button for update lessons Frame
         JButton employeeLessonsButton = new JButton("See Lesson Information");
@@ -174,7 +176,7 @@ public class MainFrame extends JFrame implements ActionListener{
         searchEmployeeButton.addActionListener(new ActionListener(){
         	@Override
         	public void actionPerformed(ActionEvent e){
-        		createEmployeeSearchFrame();
+        		createEmployeeSearchFrame("Novice");
         	}
         });
         
@@ -418,7 +420,7 @@ public class MainFrame extends JFrame implements ActionListener{
     }
     // TODO
     // Frame for employees to search employees
-    private void createEmployeeSearchFrame() {
+    private void createEmployeeSearchFrame(final String div) {
     	final JFrame main = createSubFrame();
     	main.setVisible(true);
     	JPanel panel = new JPanel();
@@ -467,7 +469,7 @@ public class MainFrame extends JFrame implements ActionListener{
 	            	try {
 						q.deleteEmployee(sin);
 						main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
-		            	createEmployeeSearchFrame();
+		            	createEmployeeSearchFrame(div);
 						JFrame popUp = createPopup("Success!", "Deletion of employee " + name + " with SIN: " + sin + " was successful.");
 		            	popUp.setVisible(true);
 					} catch (SQLException e1) {
@@ -512,61 +514,62 @@ public class MainFrame extends JFrame implements ActionListener{
         
         panel.add(coachesPanel);
     
-  //Division Coach Row
-	JPanel divisionCoachPanel = new JPanel();
-	divisionCoachPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-	divisionCoachPanel.setLayout(new BoxLayout(divisionCoachPanel, BoxLayout.Y_AXIS));
-   
-    JLabel divisionCoachLabel = new JLabel("Coaches teaching all lessons of a level:");
-    divisionCoachPanel.add(divisionCoachLabel);
-    String[] levelList = {"Novice", "Intermediate", "Advanced"};
-	final JComboBox<String> levelComboBox = new JComboBox<String>(levelList);
-	divisionCoachPanel.add(levelComboBox);
-	
-	/*Combobox listener
-	
-	levelComboBox.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JComboBox combo = (JComboBox)e.getSource();
-            String level = (String)combo.getSelectedItem();
-            System.out.println(level);
+      //Division Coach Row
+    	JPanel divisionCoachPanel = new JPanel();
+    	divisionCoachPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    	divisionCoachPanel.setLayout(new BoxLayout(divisionCoachPanel, BoxLayout.Y_AXIS));
+        String[] levelList = {"Novice", "Intermediate", "Advanced"};
+    	final JComboBox<String> levelComboBox = new JComboBox<String>(levelList);
+    	levelComboBox.setSelectedItem(div);
+    	levelComboBox.setVisible(true);
+    	JLabel divisionCoachLabel = new JLabel("Coaches teaching all lessons of level: "+ levelComboBox.getSelectedItem());
+        JPanel selectionPanel = new JPanel();
+        selectionPanel.setLayout(new FlowLayout());
+    	selectionPanel.add(levelComboBox);
+    	selectionPanel.add(divisionCoachLabel);
+    	divisionCoachPanel.add(selectionPanel);
+    	
+        try{
+        	List<DivisionCoachRow> DivisionRow = q.getDivisionCoaches(String.valueOf(levelComboBox.getSelectedIndex() + 1));
+        	String[] columnNames = {"Coach Name", "Coach Phone Number"};
+        	final Object[][] data = new Object[DivisionRow.size()][2];
+    		int i=0;
+    		for(DivisionCoachRow row: DivisionRow){
+            	String[] info = { row.getName(), row.getPhone()};
+            	data[i] = info;
+            	i++;
+            }
+    		final JTable DivisionCoachTable = new JTable(data,columnNames);
+    		DivisionCoachTable.setPreferredSize(new Dimension(400, 100));
+    		JScrollPane scrollPane = new JScrollPane(DivisionCoachTable);
+    		scrollPane.setPreferredSize(new Dimension(400, 100));
+    		divisionCoachPanel.add(scrollPane);
+        } catch (SQLException e){
+        	System.out.println("Problem retrieving division coaches");
+    		e.printStackTrace();
         }
-    });
-    */
-    try{
-    	List<DivisionCoachRow> DivisionRow = q.getDivisionCoaches(String.valueOf(levelComboBox.getSelectedIndex() + 1));
-    	String[] columnNames = {"Coach Name", "Coach Phone Number"};
-    	final Object[][] data = new Object[DivisionRow.size()][2];
-		int i=0;
-		for(DivisionCoachRow row: DivisionRow){
-        	String[] info = { row.getName(), row.getPhone()};
-        	data[i] = info;
-        	i++;
+        
+        
+        panel.add(divisionCoachPanel);
+        
+    	//close button 
+        JButton close = new JButton("Close");
+        panel.add(close);
+        close.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	main.setVisible(false);
+            }
+        });
+        levelComboBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                  String selected = (String) levelComboBox.getSelectedItem();
+            main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
+                  createEmployeeSearchFrame(selected);
+                }
+            });
         }
-		final JTable DivisionCoachTable = new JTable(data,columnNames);
-		DivisionCoachTable.setPreferredSize(new Dimension(600, 100));
-		JScrollPane scrollPane = new JScrollPane(DivisionCoachTable);
-		scrollPane.setPreferredSize(new Dimension(600, 100));
-		divisionCoachPanel.add(scrollPane);
-    } catch (SQLException e){
-    	System.out.println("Problem retrieving division coaches");
-		e.printStackTrace();
-    }
-    
-    
-    panel.add(divisionCoachPanel);
-    
-	//close button 
-    JButton close = new JButton("Close");
-    panel.add(close);
-    close.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-        	main.setVisible(false);
-        }
-    });
-    }
     
     
     
@@ -579,13 +582,13 @@ public class MainFrame extends JFrame implements ActionListener{
     	main.add(panel);
     	panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    	panel.add(new JLabel("Customer Reservation information"));
+    	panel.add(new JLabel("Customer Court Reservation information"));
     	//Division Court Row
     	JPanel divisionCourtPanel = new JPanel();
     	divisionCourtPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     	divisionCourtPanel.setLayout(new BoxLayout(divisionCourtPanel, BoxLayout.Y_AXIS));
        
-        JLabel divisionCourtLabel = new JLabel("Customers that reserved hard surface courts:");
+        JLabel divisionCourtLabel = new JLabel("Customers that reserved courts of all surface types:");
         divisionCourtPanel.add(divisionCourtLabel);
         try{
         	List<DivisionCourtRow> DivisionRow = q.getDivisionCourts();
@@ -1231,6 +1234,8 @@ public class MainFrame extends JFrame implements ActionListener{
 					customer = q.getCustomer(id,pass);
 					if (customer == null) {
 						System.out.println("Customer does not exist");
+						JOptionPane wronguserName = new JOptionPane();
+						wronguserName.showMessageDialog(mainFrame, "Username or Password is incorrect");
 	        			controlPanel.add(new JLabel("Username or Password is incorrect"));
 	        			} else {
 	        				System.out.println("producing customer frame");
@@ -1240,6 +1245,18 @@ public class MainFrame extends JFrame implements ActionListener{
 	    		} else if (userType.equals("admin")){
 	    			admin = q.getAdmin(id);
 	    			produceEmployeeFrame();
+	    			/*
+	    			if (customer == null) {
+						System.out.println("Employee does not exist");
+						JOptionPane wronguserName = new JOptionPane();
+						wronguserName.showMessageDialog(mainFrame, "Username or Password is incorrect");
+	        			controlPanel.add(new JLabel("Username or Password is incorrect"));
+	        			} else {
+	        				System.out.println("producing admin frame");
+	        				EmployeeID = id;
+	        				produceEmployeeFrame();
+	        			}
+	        			*/
 	    		}
 			} catch (SQLException e1) {
 				System.out.println("Something went wrong while loading customer");
