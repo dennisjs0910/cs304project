@@ -21,6 +21,8 @@ import row.DivisionCoachRow;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
@@ -58,6 +60,12 @@ public class MainFrame extends JFrame implements ActionListener{
     private String rStartTime;
     private String rEndTime;
     private String custLessonLevel;
+    
+    private String custName;
+    private String custPhone;
+    private String custCredit;
+    private String custAddress;
+    private String custAge;
 
     public MainFrame(){
     	q = new QueryFacade(false, "");
@@ -668,14 +676,14 @@ public class MainFrame extends JFrame implements ActionListener{
         JTextField passwordText = new JTextField("password",10);
         JButton login = new JButton("login");
         
-        nameText.addActionListener(saveUserName);
+//        nameText.addActionListener(saveUserName);
 //        passwordText.addActionListener(l);
         
         controlPanel.add(nameText);
         controlPanel.add(passwordText);
         controlPanel.add(login);
-        nameText.addActionListener(saveUserName);
-        passwordText.addActionListener(savePassword);
+        nameText.addFocusListener(saveUserName);
+        passwordText.addFocusListener(savePassword);
         login.addActionListener(auth);
         mainFrame.setVisible(true);
     }
@@ -697,22 +705,36 @@ public class MainFrame extends JFrame implements ActionListener{
         }
     };
     
-    ActionListener saveUserName = new ActionListener(){
+    FocusListener saveUserName = new FocusListener(){
     	@Override
-        public void actionPerformed(ActionEvent e) {
+    	public void focusLost(FocusEvent e) {
     		JTextField o = (JTextField)e.getSource();
     		String name = o.getText();
     		auth.setName(name);
         }
+    	
+    	 @Override
+         public void focusGained(FocusEvent e) {
+             // TODO Auto-generated method stub
+    		 JTextField o = (JTextField)e.getSource();
+     		String name = o.getText();
+     		auth.setName(name);
+             
+         }
     };
     
-    ActionListener savePassword = new ActionListener(){
+    FocusListener savePassword = new FocusListener(){
     	@Override
-        public void actionPerformed(ActionEvent e) {
+    	public void focusLost(FocusEvent e) {
     		JTextField o = (JTextField)e.getSource();
     		String password = o.getText();
     		auth.setPassword(password);
         }
+    	 @Override
+         public void focusGained(FocusEvent e) {
+             // TODO Auto-generated method stub
+             
+         }
     };
 
     //Customer book tennis court sub frame.
@@ -1061,8 +1083,18 @@ public class MainFrame extends JFrame implements ActionListener{
     	} 
     	return "Advanced";
     }
+    
+    private void updateCustomerField(){
+		custName = customer.getName();
+		custPhone = customer.getPhone();
+		custCredit = customer.getCcnumber();
+		custAddress = customer.getAddress();
+		custAge = customer.getAge();
+    }
 
+    //TODO
     private void custUpdateSubFrame(){
+    	updateCustomerField();
     	final JFrame frame = createSubFrame();
     	JPanel updateControlPanel = new JPanel();
     	updateControlPanel.setLayout(new BoxLayout(updateControlPanel, BoxLayout.PAGE_AXIS));
@@ -1075,11 +1107,69 @@ public class MainFrame extends JFrame implements ActionListener{
         JTextField age = new JTextField(customer.getAge(),20);
         JButton finishUpdateButton = new JButton("finish");
         // adding listeners to each text fields
-        nameText.addActionListener(updateCustName);
-        phone.addActionListener(updateCustPhone);
-        address.addActionListener(updateCustAddress);
-        age.addActionListener(updateCustAge);
-        ccnumber.addActionListener(updateCustCard);
+        nameText.addFocusListener(new FocusListener(){
+        	@Override
+        	public void focusLost(FocusEvent e) {
+        		JTextField o = (JTextField)e.getSource();
+        		custName = o.getText();        		
+            }
+        	 @Override
+             public void focusGained(FocusEvent e) {
+                 // 
+                 
+             }
+        });
+        phone.addFocusListener( new FocusListener(){
+        	@Override
+        	public void focusLost(FocusEvent e) {
+        		JTextField o = (JTextField)e.getSource();
+        		custPhone = o.getText();
+            }
+        	 @Override
+             public void focusGained(FocusEvent e) {
+                 
+                 
+             }
+        });
+    	System.out.println(custAddress);
+        address.addFocusListener(new FocusListener(){
+        	@Override
+        	public void focusLost(FocusEvent e) {
+        		JTextField o = (JTextField)e.getSource();
+        		custAddress = o.getText();
+        	
+            }
+        	 @Override
+             public void focusGained(FocusEvent e) {
+                 
+                 
+             }
+        });
+       
+        age.addFocusListener(new FocusListener(){
+        	@Override
+        	public void focusLost(FocusEvent e) {
+        		JTextField o = (JTextField)e.getSource();
+        		custAge = o.getText();
+        	
+            }
+        	 @Override
+             public void focusGained(FocusEvent e) {
+        		 
+             }
+        });
+        ccnumber.addFocusListener(new FocusListener(){
+        	@Override
+        	public void focusLost(FocusEvent e) {
+        		JTextField o = (JTextField)e.getSource();
+        		custCredit = o.getText();
+            }
+        	 @Override
+             public void focusGained(FocusEvent e) {
+
+                 
+             }
+        });
         
         // adding text fields into control panel and then into update frame
         frame.add(updateLabel);
@@ -1097,9 +1187,20 @@ public class MainFrame extends JFrame implements ActionListener{
         frame.add(updateControlPanel);
         frame.setVisible(true);
         finishUpdateButton.addActionListener(new ActionListener(){
+        	//TODO:
         	@Override
             public void actionPerformed(ActionEvent e) {
         		try{
+        			q.updateCustomerName(customer.getCid(), custName);
+                    customer.setName(custName);
+                    q.updateCustomerPhone(customer.getCid(), custPhone);
+                    customer.setPhone(custPhone);
+                    q.updateCustomerAddress(customer.getCid(), custAddress);
+					customer.setAddress(custAddress);                       
+					q.updateCustomerAge(customer.getCid(), Integer.parseInt(custAge));
+					customer.setAge(custAge);   
+					q.updateCustomerCard(customer.getCid(), custCredit);
+                    customer.setCcNumber(custCredit);	
         		customer = q.getCustomer(customer.getCid(), customer.getPhone());
         		}catch(Exception err){
         			System.out.println("Error while updating");
@@ -1112,94 +1213,6 @@ public class MainFrame extends JFrame implements ActionListener{
         });
     }
     
-    
-    ActionListener updateCustName = new ActionListener(){
-    	@Override
-        public void actionPerformed(ActionEvent e) {
-    		JTextField o = (JTextField)e.getSource();
-    		String custName = o.getText();
-    		try{
-    			if(q == null) {
-    				System.out.println("sometihng is wrong");
-    			}
-    			q.updateCustomerName(customer.getCid(), custName);
-    			customer.setName(custName);
-    		}catch(Exception err){
-    			System.out.println("something went wrong while updating customer name");
-    			err.printStackTrace();
-    		}
-    		
-        }
-    };
-    
-    ActionListener updateCustCard = new ActionListener(){
-    	@Override
-        public void actionPerformed(ActionEvent e) {
-    		JTextField o = (JTextField)e.getSource();
-    		String card = o.getText();
-    		try{
-    			if(q == null) {
-    				System.out.println("sometihng is wrong");
-    			}
-    			q.updateCustomerCard(customer.getCid(), card);
-    			customer.setCcNumber(card);
-    		}catch(Exception err){
-    			System.out.println("something went wrong while updating customer name");
-    			err.printStackTrace();
-    		}
-    		
-        }
-    };
-    
-    ActionListener updateCustPhone = new ActionListener(){
-    	@Override
-        public void actionPerformed(ActionEvent e) {
-    		JTextField o = (JTextField)e.getSource();
-    		String custPhone = o.getText();
-    		try{
-    			q.updateCustomerPhone(customer.getCid(), custPhone);
-    			customer.setPhone(custPhone);
-    		}catch(Exception err){
-    			System.out.println("something went wrong while updating customer phone");
-    			err.printStackTrace();
-    		}
-    		
-        }
-    };
-    
-    ActionListener updateCustAddress = new ActionListener(){
-    	@Override
-        public void actionPerformed(ActionEvent e) {
-    		JTextField o = (JTextField)e.getSource();
-    		String custAddress = o.getText();
-    		try{
-    			q.updateCustomerAddress(customer.getCid(), custAddress);
-    			customer.setAddress(custAddress);
-    		}catch(Exception err){
-    			System.out.println("something went wrong while updating customer address");
-    			err.printStackTrace();
-    		}	
-        }
-    };
-    
-    ActionListener updateCustAge = new ActionListener(){
-    	@Override
-        public void actionPerformed(ActionEvent e) {
-    		JTextField o = (JTextField)e.getSource();
-    		String age = o.getText();
-    		try{
-    			q.updateCustomerAge(customer.getCid(), Integer.parseInt(age));
-    			customer.setAge(age);
-    		}catch(Exception err){
-    			JOptionPane tooOld = new JOptionPane();
-    			tooOld.showMessageDialog(mainFrame, "Age Cannot be greater than 120.");
-    			//TODO:
-    			System.out.println("something went wrong while updating customer age");
-    			err.printStackTrace();
-    		}	
-        }
-    };
-
     private JFrame createSubFrame(){
         final JFrame frame = new JFrame();
         frame.setSize(750, 750);
@@ -1242,9 +1255,11 @@ public class MainFrame extends JFrame implements ActionListener{
     	
     	public void setName(String userName){
     		id = userName;
+    		System.out.println(id);
     	}
     	public void setPassword(String password){
     		pass = password;
+    		System.out.println(pass);
     	}
     	
     	@Override
@@ -1286,6 +1301,8 @@ public class MainFrame extends JFrame implements ActionListener{
 	        			*/
 	    		}
 			} catch (SQLException e1) {
+				JOptionPane wronguserName = new JOptionPane();
+				wronguserName.showMessageDialog(mainFrame, "Username or Password is incorrect");
 				System.out.println("Something went wrong while loading customer");
 				e1.printStackTrace();
 			}
