@@ -1155,7 +1155,12 @@ public class MainFrame extends JFrame implements ActionListener{
         			Integer.parseInt(custAge);
         		}catch(Exception err) {
         			JOptionPane typeChecking = new JOptionPane();
-        			typeChecking.showMessageDialog(frame, "Age has to be a number and cannot be greter than 120");
+        			typeChecking.showMessageDialog(frame, "Age has to be a number");
+        		}
+        		
+        		if(Integer.parseInt(custAge) > 120){
+        			JOptionPane typeChecking = new JOptionPane();
+        			typeChecking.showMessageDialog(frame, "Age cannot be greater than 120");
         		}
         	
             }
@@ -1203,12 +1208,14 @@ public class MainFrame extends JFrame implements ActionListener{
                     customer.setPhone(custPhone);
                     q.updateCustomerAddress(customer.getCid(), custAddress);
 					customer.setAddress(custAddress);                       
-					q.updateCustomerAge(customer.getCid(), Integer.parseInt(custAge));
 					customer.setAge(custAge);   
+        			q.updateCustomerAge(customer.getCid(), Integer.parseInt(custAge));
 					q.updateCustomerCard(customer.getCid(), custCredit);
                     customer.setCcNumber(custCredit);	
         		customer = q.getCustomer(customer.getCid(), customer.getPhone());
         		}catch(Exception err){
+        			JOptionPane typeChecking = new JOptionPane();
+        			typeChecking.showMessageDialog(frame, "Something went wrong while updating");
         			System.out.println("Error while updating");
         			err.printStackTrace();
         		}
