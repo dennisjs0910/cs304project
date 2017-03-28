@@ -248,6 +248,14 @@ public class QueryFacade
 		String view = "create view temp(cid, name, numRes) as select c.cid, c.name, count(*) as numRes FROM Reserve r, Customer c WHERE r.cid=c.cid group by c.cid, c.name";
 
 		Statement s = conn.createStatement();
+		try
+		{
+			s.executeQuery("drop view temp");
+		}
+		catch (SQLException e)
+		{
+			System.out.println("view already dropped");
+		}
 		s.executeQuery(view);
 		
 		String query = "select Temp.cid, Temp.name, Temp.numRes FROM Temp WHERE Temp.numRes = (SELECT " + minMax + "(Temp.numRes) FROM Temp)";
