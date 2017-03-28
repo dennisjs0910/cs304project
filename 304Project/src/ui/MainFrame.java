@@ -1151,6 +1151,12 @@ public class MainFrame extends JFrame implements ActionListener{
         	public void focusLost(FocusEvent e) {
         		JTextField o = (JTextField)e.getSource();
         		custAge = o.getText();
+        		try{
+        			Integer.parseInt(custAge);
+        		}catch(Exception err) {
+        			JOptionPane typeChecking = new JOptionPane();
+        			typeChecking.showMessageDialog(frame, "Age has to be a number and cannot be greter than 120");
+        		}
         	
             }
         	 @Override
