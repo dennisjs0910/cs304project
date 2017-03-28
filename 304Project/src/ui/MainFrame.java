@@ -676,14 +676,14 @@ public class MainFrame extends JFrame implements ActionListener{
         JTextField passwordText = new JTextField("password",10);
         JButton login = new JButton("login");
         
-        nameText.addActionListener(saveUserName);
+//        nameText.addActionListener(saveUserName);
 //        passwordText.addActionListener(l);
         
         controlPanel.add(nameText);
         controlPanel.add(passwordText);
         controlPanel.add(login);
-        nameText.addActionListener(saveUserName);
-        passwordText.addActionListener(savePassword);
+        nameText.addFocusListener(saveUserName);
+        passwordText.addFocusListener(savePassword);
         login.addActionListener(auth);
         mainFrame.setVisible(true);
     }
@@ -705,22 +705,36 @@ public class MainFrame extends JFrame implements ActionListener{
         }
     };
     
-    ActionListener saveUserName = new ActionListener(){
+    FocusListener saveUserName = new FocusListener(){
     	@Override
-        public void actionPerformed(ActionEvent e) {
+    	public void focusLost(FocusEvent e) {
     		JTextField o = (JTextField)e.getSource();
     		String name = o.getText();
     		auth.setName(name);
         }
+    	
+    	 @Override
+         public void focusGained(FocusEvent e) {
+             // TODO Auto-generated method stub
+    		 JTextField o = (JTextField)e.getSource();
+     		String name = o.getText();
+     		auth.setName(name);
+             
+         }
     };
     
-    ActionListener savePassword = new ActionListener(){
+    FocusListener savePassword = new FocusListener(){
     	@Override
-        public void actionPerformed(ActionEvent e) {
+    	public void focusLost(FocusEvent e) {
     		JTextField o = (JTextField)e.getSource();
     		String password = o.getText();
     		auth.setPassword(password);
         }
+    	 @Override
+         public void focusGained(FocusEvent e) {
+             // TODO Auto-generated method stub
+             
+         }
     };
 
     //Customer book tennis court sub frame.
@@ -1101,7 +1115,7 @@ public class MainFrame extends JFrame implements ActionListener{
             }
         	 @Override
              public void focusGained(FocusEvent e) {
-                 // TODO Auto-generated method stub
+                 // 
                  
              }
         });
@@ -1113,7 +1127,7 @@ public class MainFrame extends JFrame implements ActionListener{
             }
         	 @Override
              public void focusGained(FocusEvent e) {
-                 // TODO Auto-generated method stub
+                 
                  
              }
         });
@@ -1123,26 +1137,25 @@ public class MainFrame extends JFrame implements ActionListener{
         	public void focusLost(FocusEvent e) {
         		JTextField o = (JTextField)e.getSource();
         		custAddress = o.getText();
-        		System.out.println(custAddress);
+        	
             }
         	 @Override
              public void focusGained(FocusEvent e) {
-                 // TODO Auto-generated method stub
+                 
                  
              }
         });
-        System.out.println(custAge);
+       
         age.addFocusListener(new FocusListener(){
         	@Override
         	public void focusLost(FocusEvent e) {
         		JTextField o = (JTextField)e.getSource();
         		custAge = o.getText();
-        		System.out.println("after:  "+custAge);
+        	
             }
         	 @Override
              public void focusGained(FocusEvent e) {
-                 // TODO Auto-generated method stub
-        		 System.out.println("lol "+ custAge);
+        		 
              }
         });
         ccnumber.addFocusListener(new FocusListener(){
@@ -1153,7 +1166,7 @@ public class MainFrame extends JFrame implements ActionListener{
             }
         	 @Override
              public void focusGained(FocusEvent e) {
-                 // TODO Auto-generated method stub
+
                  
              }
         });
@@ -1200,94 +1213,6 @@ public class MainFrame extends JFrame implements ActionListener{
         });
     }
     
-    
-//    ActionListener updateCustName = new ActionListener(){
-//    	@Override
-//        public void actionPerformed(ActionEvent e) {
-//    		JTextField o = (JTextField)e.getSource();
-//    		String custName = o.getText();
-//    		try{
-//    			if(q == null) {
-//    				System.out.println("sometihng is wrong");
-//    			}
-//    			q.updateCustomerName(customer.getCid(), custName);
-//    			customer.setName(custName);
-//    		}catch(Exception err){
-//    			System.out.println("something went wrong while updating customer name");
-//    			err.printStackTrace();
-//    		}
-//    		
-//        }
-//    };
-//    
-//    ActionListener updateCustCard = new ActionListener(){
-//    	@Override
-//        public void actionPerformed(ActionEvent e) {
-//    		JTextField o = (JTextField)e.getSource();
-//    		String card = o.getText();
-//    		try{
-//    			if(q == null) {
-//    				System.out.println("sometihng is wrong");
-//    			}
-//    			q.updateCustomerCard(customer.getCid(), card);
-//    			customer.setCcNumber(card);
-//    		}catch(Exception err){
-//    			System.out.println("something went wrong while updating customer name");
-//    			err.printStackTrace();
-//    		}
-//    		
-//        }
-//    };
-    
-//    ActionListener updateCustPhone = new ActionListener(){
-//    	@Override
-//        public void actionPerformed(ActionEvent e) {
-//    		JTextField o = (JTextField)e.getSource();
-//    		String custPhone = o.getText();
-//    		try{
-//    			q.updateCustomerPhone(customer.getCid(), custPhone);
-//    			customer.setPhone(custPhone);
-//    		}catch(Exception err){
-//    			System.out.println("something went wrong while updating customer phone");
-//    			err.printStackTrace();
-//    		}
-//    		
-//        }
-//    };
-    
-//    ActionListener updateCustAddress = new ActionListener(){
-//    	@Override
-//        public void actionPerformed(ActionEvent e) {
-//    		JTextField o = (JTextField)e.getSource();
-//    		String custAddress = o.getText();
-//    		try{
-//    			q.updateCustomerAddress(customer.getCid(), custAddress);
-//    			customer.setAddress(custAddress);
-//    		}catch(Exception err){
-//    			System.out.println("something went wrong while updating customer address");
-//    			err.printStackTrace();
-//    		}	
-//        }
-//    };
-//    
-//    ActionListener updateCustAge = new ActionListener(){
-//    	@Override
-//        public void actionPerformed(ActionEvent e) {
-//    		JTextField o = (JTextField)e.getSource();
-//    		String age = o.getText();
-//    		try{
-//    			q.updateCustomerAge(customer.getCid(), Integer.parseInt(age));
-//    			customer.setAge(age);
-//    		}catch(Exception err){
-//    			JOptionPane tooOld = new JOptionPane();
-//    			tooOld.showMessageDialog(mainFrame, "Age Cannot be greater than 120.");
-//    			//TODO:
-//    			System.out.println("something went wrong while updating customer age");
-//    			err.printStackTrace();
-//    		}	
-//        }
-//    };
-
     private JFrame createSubFrame(){
         final JFrame frame = new JFrame();
         frame.setSize(750, 750);
@@ -1330,9 +1255,11 @@ public class MainFrame extends JFrame implements ActionListener{
     	
     	public void setName(String userName){
     		id = userName;
+    		System.out.println(id);
     	}
     	public void setPassword(String password){
     		pass = password;
+    		System.out.println(pass);
     	}
     	
     	@Override
