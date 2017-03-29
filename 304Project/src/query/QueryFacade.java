@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.spi.DirStateFactory.Result;
+
 import row.AggregationLessonAgeRow;
 import row.AggregationLessonCountRow;
 import row.Coach;
@@ -68,6 +70,22 @@ public class QueryFacade
 			String level = rs.getString("l_level");
 			SelectionRow selectionRow = new SelectionRow(lid, courtid, sin, level);
 			rows.add(selectionRow);
+		}
+		s.close();
+		return rows;
+	}
+	
+	public List<String> getSelectionCustomer(String attr, String age, String condition) throws SQLException
+	{
+		String query = "SELECT " + attr + " FROM Customer WHERE age " + condition + age;
+		
+		List<String> rows = new ArrayList<String>();
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		
+		while (rs.next())
+		{
+			rows.add(rs.getString(1));
 		}
 		s.close();
 		return rows;

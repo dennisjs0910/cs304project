@@ -66,6 +66,8 @@ public class MainFrame extends JFrame implements ActionListener{
     private String custCredit;
     private String custAddress;
     private String custAge;
+    
+    private String conditionAge;
 
     public MainFrame(){
     	q = new QueryFacade(false, "");
@@ -195,7 +197,7 @@ public class MainFrame extends JFrame implements ActionListener{
         searchCustomersButton.addActionListener(new ActionListener(){
         	@Override
         	public void actionPerformed(ActionEvent e){
-        		createCustomerSearchFrame();
+        		createCustomerSearchFrame("Name", ">", "0");
         	}
         });
         
@@ -584,7 +586,8 @@ public class MainFrame extends JFrame implements ActionListener{
     
     
     // Frame for employees to search for customers
-    private void createCustomerSearchFrame() {
+    private void createCustomerSearchFrame(String attr, String condition, String age) {
+    	conditionAge = age;
     	final JFrame main = createSubFrame();
     	main.setVisible(true);
     	JPanel panel = new JPanel();
@@ -630,6 +633,81 @@ public class MainFrame extends JFrame implements ActionListener{
             	main.setVisible(false);
             }
         });
+        
+        JPanel selectionPanel = new JPanel();
+        selectionPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        selectionPanel.setLayout(new BoxLayout(selectionPanel, BoxLayout.Y_AXIS));
+        
+        JPanel attrPanel = new JPanel();
+        attrPanel.setLayout(new FlowLayout());
+        attrPanel.add(new JLabel("Show customer"));
+        String[] attributeList = {"Name", "Phone", "Address"};
+    	final JComboBox<String> attrComboBox = new JComboBox<String>(attributeList);
+    	attrComboBox.setSelectedItem(attr);
+    	attrComboBox.setVisible(true);
+    	attrPanel.add(attrComboBox);
+    	JPanel conditionPanel = new JPanel(new FlowLayout());
+    	conditionPanel.add(new JLabel("whose age is"));
+
+        String[] conditionList = {">", ">=", "<", "<="};
+    	final JComboBox<String> condComboBox = new JComboBox<String>(conditionList);
+    	condComboBox.setSelectedItem(condition);
+    	condComboBox.setVisible(true);
+    	conditionPanel.add(condComboBox);
+    	JButton search = new JButton("Search");
+    	
+        search.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+				main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
+	            createCustomerSearchFrame((String)attrComboBox.getSelectedItem(), (String)condComboBox.getSelectedItem(), conditionAge);
+            }
+        });
+    	
+    	JTextField constantField = new JTextField(conditionAge, 10);
+    	conditionPanel.add(constantField);
+    	constantField.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+
+        		JTextField o = (JTextField)e.getSource();
+        		conditionAge = o.getText();
+				
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+    	
+        
+        selectionPanel.add(attrPanel);
+        selectionPanel.add(conditionPanel);
+        selectionPanel.add(search);
+        try {
+			List<String> rows = q.getSelectionCustomer((String)attrComboBox.getSelectedItem(), conditionAge, (String)condComboBox.getSelectedItem());
+			String[] columnNames = {(String)attrComboBox.getSelectedItem()};
+			Object[][] data = new Object[rows.size()][1];
+			int i = 0;
+			for(String row: rows){
+	        	String[] info = {row};
+	        	data[i] = info;
+	        	i++;
+	        }
+			JTable lessonTable = new JTable(data, columnNames);
+			JScrollPane scrollPane = new JScrollPane(lessonTable);
+			scrollPane.setPreferredSize(new Dimension(300, 200));
+			selectionPanel.add(scrollPane);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			System.out.println("Something went wrong while getting Coaches");
+			e1.printStackTrace();
+		}
+        
+        panel.add(selectionPanel);
     }
     
 
