@@ -78,7 +78,7 @@ public class QueryFacade
 	public List<String> getSelectionCustomer(String attr, String age, String condition) throws SQLException
 	{
 		String query = "SELECT " + attr + " FROM Customer WHERE age " + condition + age;
-		
+
 		List<String> rows = new ArrayList<String>();
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);

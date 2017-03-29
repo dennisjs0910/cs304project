@@ -659,9 +659,24 @@ public class MainFrame extends JFrame implements ActionListener{
         search.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-				main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
-	            createCustomerSearchFrame((String)attrComboBox.getSelectedItem(), (String)condComboBox.getSelectedItem(), conditionAge);
-            }
+            	try{
+            		Integer.parseInt(conditionAge);
+        		
+            		if(Integer.parseInt(conditionAge) > 120 || Integer.parseInt(conditionAge) < 0){
+            			JOptionPane typeChecking = new JOptionPane();
+            			typeChecking.showMessageDialog(main, "Age must be between 0 and 120");
+            		}
+            		else
+            		{
+            			main.dispatchEvent(new WindowEvent(main, WindowEvent.WINDOW_CLOSING));
+            			createCustomerSearchFrame((String)attrComboBox.getSelectedItem(), (String)condComboBox.getSelectedItem(), conditionAge);
+            		}
+            	}catch(Exception err) {
+            		JOptionPane typeChecking = new JOptionPane();
+            		typeChecking.showMessageDialog(main, "Age has to be a number");
+            	}
+
+			}
         });
     	
     	JTextField constantField = new JTextField(conditionAge, 10);
@@ -673,6 +688,18 @@ public class MainFrame extends JFrame implements ActionListener{
 
         		JTextField o = (JTextField)e.getSource();
         		conditionAge = o.getText();
+        		
+        		try{
+        			Integer.parseInt(conditionAge);
+        		}catch(Exception err) {
+        			JOptionPane typeChecking = new JOptionPane();
+        			typeChecking.showMessageDialog(main, "Age has to be a number");
+        		}
+        		
+        		if(Integer.parseInt(conditionAge) > 120 || Integer.parseInt(conditionAge) < 0){
+        			JOptionPane typeChecking = new JOptionPane();
+        			typeChecking.showMessageDialog(main, "Age must be between 0 and 120");
+        		}
 				
 			}
 			
@@ -702,9 +729,8 @@ public class MainFrame extends JFrame implements ActionListener{
 			scrollPane.setPreferredSize(new Dimension(300, 200));
 			selectionPanel.add(scrollPane);
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			System.out.println("Something went wrong while getting Coaches");
-			e1.printStackTrace();
+			JOptionPane typeChecking = new JOptionPane();
+			typeChecking.showMessageDialog(main, "Age must be between 0 and 120.");
 		}
         
         panel.add(selectionPanel);
@@ -1188,8 +1214,19 @@ public class MainFrame extends JFrame implements ActionListener{
         nameText.addFocusListener(new FocusListener(){
         	@Override
         	public void focusLost(FocusEvent e) {
+        		String old = custName;
         		JTextField o = (JTextField)e.getSource();
-        		custName = o.getText();        		
+        		custName = o.getText();
+        		for (int i = 0; i < custName.length(); i++)
+        		{
+        			if (!Character.isLetter(custName.charAt(i)) && !custName.substring(i, i+1).equals(" "))
+        			{
+        				JOptionPane typeChecking = new JOptionPane();
+            			typeChecking.showMessageDialog(frame, "Name can only contian letters and spaces.");
+            			custName = old;
+            			o.setText(custName);
+        			}
+        		}
             }
         	 @Override
              public void focusGained(FocusEvent e) {
@@ -1200,8 +1237,27 @@ public class MainFrame extends JFrame implements ActionListener{
         phone.addFocusListener( new FocusListener(){
         	@Override
         	public void focusLost(FocusEvent e) {
+        		String old = custPhone;
         		JTextField o = (JTextField)e.getSource();
         		custPhone = o.getText();
+        		
+        		if (custPhone.length() != 10)
+        		{
+    				JOptionPane typeChecking = new JOptionPane();
+        			typeChecking.showMessageDialog(frame, "Phone number must be 10 digits long");
+        			custPhone = old;
+        			o.setText(custPhone);
+        		}
+        		for (int i = 0; i < custPhone.length(); i++)
+        		{
+        			if (!Character.isDigit(custPhone.charAt(i)))
+        			{
+        				JOptionPane typeChecking = new JOptionPane();
+        				typeChecking.showMessageDialog(frame, "Phone number must be digits only. E.g. 6048224311");
+        				custPhone = old;
+        				o.setText(custPhone);
+        			}
+        		}
             }
         	 @Override
              public void focusGained(FocusEvent e) {
@@ -1213,8 +1269,21 @@ public class MainFrame extends JFrame implements ActionListener{
         address.addFocusListener(new FocusListener(){
         	@Override
         	public void focusLost(FocusEvent e) {
+        		String old = custAddress;
         		JTextField o = (JTextField)e.getSource();
         		custAddress = o.getText();
+        		
+        		for (int i = 0; i < custAddress.length(); i++)
+        		{
+        			if (!Character.isLetter(custAddress.charAt(i)) && !Character.isDigit(custAddress.charAt(i))
+        					&& !custAddress.substring(i, i+1).equals(" ") && !custAddress.substring(i, i+1).equals(","))
+        			{
+        				JOptionPane typeChecking = new JOptionPane();
+            			typeChecking.showMessageDialog(frame, "Address can only contain letters, digits, spaces, and commas.");
+            			custAddress = old;
+            			o.setText(custAddress);
+        			}
+        		}
         	
             }
         	 @Override
@@ -1227,6 +1296,8 @@ public class MainFrame extends JFrame implements ActionListener{
         age.addFocusListener(new FocusListener(){
         	@Override
         	public void focusLost(FocusEvent e) {
+        		String old = custAge;
+        		System.out.println("OLD: " + old);
         		JTextField o = (JTextField)e.getSource();
         		custAge = o.getText();
         		try{
@@ -1234,11 +1305,13 @@ public class MainFrame extends JFrame implements ActionListener{
         		}catch(Exception err) {
         			JOptionPane typeChecking = new JOptionPane();
         			typeChecking.showMessageDialog(frame, "Age has to be a number");
+        			custAge = old;
+        			o.setText(custAge);
         		}
         		
-        		if(Integer.parseInt(custAge) > 120){
+        		if(Integer.parseInt(custAge) > 120 || Integer.parseInt(custAge) < 0){
         			JOptionPane typeChecking = new JOptionPane();
-        			typeChecking.showMessageDialog(frame, "Age cannot be greater than 120");
+        			typeChecking.showMessageDialog(frame, "Age must be between 0 and 120");
         		}
         	
             }
@@ -1250,8 +1323,27 @@ public class MainFrame extends JFrame implements ActionListener{
         ccnumber.addFocusListener(new FocusListener(){
         	@Override
         	public void focusLost(FocusEvent e) {
+        		String old = custCredit;
         		JTextField o = (JTextField)e.getSource();
         		custCredit = o.getText();
+        		
+        		if (custCredit.length() != 16)
+        		{
+    				JOptionPane typeChecking = new JOptionPane();
+        			typeChecking.showMessageDialog(frame, "Credit card number must be 16 digits long");
+        			custCredit = old;
+        			o.setText(custCredit);
+        		}
+        		for (int i = 0; i < custCredit.length(); i++)
+        		{
+        			if (!Character.isDigit(custCredit.charAt(i)))
+        			{
+        				JOptionPane typeChecking = new JOptionPane();
+        				typeChecking.showMessageDialog(frame, "Credit card number must be digits only.");
+        				custCredit = old;
+        				o.setText(custCredit);
+        			}
+        		}
             }
         	 @Override
              public void focusGained(FocusEvent e) {
@@ -1307,7 +1399,7 @@ public class MainFrame extends JFrame implements ActionListener{
         		catch (Exception error)
         		{
         			JOptionPane typeChecking = new JOptionPane();
-        			typeChecking.showMessageDialog(frame, "Age cannot be greater than 120");
+        			typeChecking.showMessageDialog(frame, "Age must be between 0 and 120");
         		}
         	}
         });
