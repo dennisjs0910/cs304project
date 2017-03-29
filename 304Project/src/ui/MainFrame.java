@@ -1201,27 +1201,36 @@ public class MainFrame extends JFrame implements ActionListener{
         	//TODO:
         	@Override
             public void actionPerformed(ActionEvent e) {
-        		try{
-        			q.updateCustomerName(customer.getCid(), custName);
-                    customer.setName(custName);
-                    q.updateCustomerPhone(customer.getCid(), custPhone);
-                    customer.setPhone(custPhone);
-                    q.updateCustomerAddress(customer.getCid(), custAddress);
-					customer.setAddress(custAddress);                       
+        		try
+        		{                       
 					customer.setAge(custAge);   
         			q.updateCustomerAge(customer.getCid(), Integer.parseInt(custAge));
-					q.updateCustomerCard(customer.getCid(), custCredit);
-                    customer.setCcNumber(custCredit);	
-        		customer = q.getCustomer(customer.getCid(), customer.getPhone());
-        		}catch(Exception err){
-        			JOptionPane typeChecking = new JOptionPane();
-        			typeChecking.showMessageDialog(frame, "Something went wrong while updating");
-        			System.out.println("Error while updating");
-        			err.printStackTrace();
+            		
+            		try{
+            			q.updateCustomerName(customer.getCid(), custName);
+                        customer.setName(custName);
+                        q.updateCustomerPhone(customer.getCid(), custPhone);
+                        customer.setPhone(custPhone);
+                        q.updateCustomerAddress(customer.getCid(), custAddress);
+    					customer.setAddress(custAddress);
+    					q.updateCustomerCard(customer.getCid(), custCredit);
+                        customer.setCcNumber(custCredit);	
+            		customer = q.getCustomer(customer.getCid(), customer.getPhone());
+            		}catch(Exception err){
+            			JOptionPane typeChecking = new JOptionPane();
+            			typeChecking.showMessageDialog(frame, "Something went wrong while updating");
+            			System.out.println("Error while updating");
+            			err.printStackTrace();
+            		}
+            		frame.setVisible(false);
+            		frame.dispose();
+            		produceCustomerFrame();
         		}
-        		frame.setVisible(false);
-        		frame.dispose();
-        		produceCustomerFrame();
+        		catch (Exception error)
+        		{
+        			JOptionPane typeChecking = new JOptionPane();
+        			typeChecking.showMessageDialog(frame, "Age cannot be greater than 120");
+        		}
         	}
         });
     }
