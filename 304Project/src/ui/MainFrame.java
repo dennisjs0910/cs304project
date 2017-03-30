@@ -253,7 +253,7 @@ public class MainFrame extends JFrame implements ActionListener{
         lessonAgePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         lessonAgePanel.setLayout(new BoxLayout(lessonAgePanel, BoxLayout.Y_AXIS));
 
-        String[] aggList= {"MAX", "MIN", "AVG"};
+        String[] aggList= {"MAX", "MIN", "AVG", "SUM"};
         final JComboBox<String> aggComboBox = new JComboBox<String>(aggList);
         aggComboBox.setSelectedItem(agg);
         aggComboBox.setVisible(true);
