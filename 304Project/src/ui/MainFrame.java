@@ -1099,7 +1099,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			deleteReservation.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JFrame cancelFrame = createSubFrame();
+					final JFrame cancelFrame = createSubFrame();
 					List<ReservableTennisCourt> reserved = null;
 					try {
 						reserved = q.getReservedTennisCourts();
@@ -1136,7 +1136,6 @@ public class MainFrame extends JFrame implements ActionListener{
 				        	cancelStartTime = reservedTable.getValueAt(reservedTable.getSelectedRow(), 4).toString();
 				        }
 				    });
-					
 					cancel.addActionListener(new ActionListener(){
 
 						@Override
@@ -1148,6 +1147,9 @@ public class MainFrame extends JFrame implements ActionListener{
 						    	cancelStartTime = "";
 								btcSubFrame.setVisible(false);
 								btcSubFrame.dispose();
+								cancelFrame.setVisible(false);
+								cancelFrame.dispose();
+//								SwingUtilities.updateComponentTreeUI(cancelFrame);
 								bookTennisCourtSubFrame();
 							} catch (SQLException err) {
 								// TODO Auto-generated catch block
@@ -1157,6 +1159,8 @@ public class MainFrame extends JFrame implements ActionListener{
 						}
 						
 					});
+					
+					
 					
 				}catch (SQLException e1) {
 					// TODO Auto-generated catch block
