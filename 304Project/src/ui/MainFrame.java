@@ -55,11 +55,16 @@ public class MainFrame extends JFrame implements ActionListener{
     
     private String lessonId;
     private String reserveCourtId;
-    private String cancelCourtId;
+    
     private String reservationDate;
     private String rStartTime;
     private String rEndTime;
     private String custLessonLevel;
+    
+    private String cancelCourtId;
+    private String cancelDate;
+    private String cancelStartTime;
+    
     
     private String custName;
     private String custPhone;
@@ -848,6 +853,7 @@ public class MainFrame extends JFrame implements ActionListener{
     	reservationDate ="";
         rStartTime = "";
         rEndTime = "";
+        
     	
         final JFrame btcSubFrame = createSubFrame();
         final JPanel btcControlPanel = new JPanel();
@@ -1065,6 +1071,7 @@ public class MainFrame extends JFrame implements ActionListener{
 										System.out.println("Success!");
 										btcSubFrame.setVisible(false);
 										btcSubFrame.dispose();
+										buttonClicked = false;
 										bookTennisCourtSubFrame();
 									} else{
 										System.out.println("Fail!");
@@ -1095,20 +1102,21 @@ public class MainFrame extends JFrame implements ActionListener{
 					JFrame cancelFrame = createSubFrame();
 					List<ReservableTennisCourt> reserved = null;
 					try {
-						reserved = q.getReservableTennisCourts();
+						reserved = q.getReservedTennisCourts();
 					
 					if (reserved == null ||reserved.isEmpty()){
 						return;
 					}
-					String[] columnNames = {"CourtId", "Surface", "CentreId"};
+					String[] columnNames = {"CourtId", "Surface", "CentreId", "Date", "Start", "End"};
 					JPanel reservePanel = new JPanel();
 					reservePanel.setLayout(new BoxLayout(reservePanel, BoxLayout.PAGE_AXIS));
-					Object[][] data = new Object[reserved.size()][4];
+					Object[][] data = new Object[reserved.size()][6];
 					int i = 0;
 					
 					for(ReservableTennisCourt court: reserved){
-						if (q.customerReserved(customer.getCid(), court.getCourtId())){
-				        	String[] info = {court.getCourtId(), court.getSurface(), court.getCentreId()};
+						if (q.customerReserved(customer.getCid(), court.getCourtId(), court.getDate())){
+				        	String[] info = {court.getCourtId(), court.getSurface(), court.getCentreId(), 
+				        			court.getDate(), court.getStart(), court.getEnd()};
 				        	data[i] = info;
 				        	i++;
 						}
@@ -1124,6 +1132,10 @@ public class MainFrame extends JFrame implements ActionListener{
 					reservedTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 				        public void valueChanged(ListSelectionEvent event) {
 				        	cancelCourtId = reservedTable.getValueAt(reservedTable.getSelectedRow(), 0).toString();
+				        	cancelDate = reservedTable.getValueAt(reservedTable.getSelectedRow(), 3).toString();
+				        	cancelStartTime = reservedTable.getValueAt(reservedTable.getSelectedRow(), 4).toString();
+				        	System.out.println("CANCELLLLL "+cancelDate);
+				        	System.out.println(cancelStartTime);
 				        }
 				    });
 					
@@ -1132,7 +1144,7 @@ public class MainFrame extends JFrame implements ActionListener{
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
-								q.deleteReservation(customer.getCid(), cancelCourtId);
+								q.deleteReservation(customer.getCid(), cancelCourtId,cancelDate,cancelStartTime);
 								btcSubFrame.setVisible(false);
 								btcSubFrame.dispose();
 								bookTennisCourtSubFrame();
@@ -1158,6 +1170,7 @@ public class MainFrame extends JFrame implements ActionListener{
 			e1.printStackTrace();
 		}
     }
+
 
     private void enrollLessonSubFrame(){
         //String[] levelList = {"All" ,"Novice", "Intermediate", "Advanced"};

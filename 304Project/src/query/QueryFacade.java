@@ -346,11 +346,13 @@ public class QueryFacade
 	 * Returns true if the delete was successful. Returns false if no row matched
 	 * the given info.
 	 */
-	public boolean deleteReservation(String cid, String cancelCourtId) throws SQLException
+	public boolean deleteReservation(String cid, String cancelCourtId, String date, String start) throws SQLException
 	{
 		String query = "DELETE FROM Reserve r "
-				+ "WHERE r.cid = " + cid + " AND r.courtid = " + cancelCourtId;
-		
+				+ "WHERE r.cid = " + cid + " AND r.courtid = " + cancelCourtId+
+				" AND  r.r_date = '" + date + 
+				"' AND r.starttime = TO_DATE('" + start +"','hh24:mi:ss')";
+		System.out.println(query);
 		Statement s = conn.createStatement();
 		int rowsChanged = s.executeUpdate(query);
 		
@@ -647,6 +649,34 @@ public class QueryFacade
 		return rows;
 	}
 	
+	public List<ReservableTennisCourt> getReservedTennisCourts() throws SQLException {
+		String query = "SELECT rc.courtid, t.suface_type, t.centreId, r.r_date, r.starttime, r.endtime"+
+						" FROM TennisCourt t, ReservableCourt rc, Reserve r" +
+						" WHERE t.courtid = rc.courtid AND r.courtid = rc.courtid";
+
+		List<ReservableTennisCourt> rows = new ArrayList<ReservableTennisCourt>();
+		
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next())
+		{
+			int courtId = rs.getInt(1);
+			String surfaceT = rs.getString(2);
+			String centreId = rs.getString(3);
+			String rdate = rs.getString(4);
+			String rstart = rs.getString(5);
+			String rend = rs.getString(6);
+			
+			ReservableTennisCourt row = new ReservableTennisCourt(Integer.toString(courtId),surfaceT,centreId);
+			row.setDate(rdate);
+			row.setStart(rstart);
+			row.setEnd(rend);
+			rows.add(row);
+		}
+		s.close();
+		return rows;
+	}
+	
 	/*
 	 * returns the start and end time of reservation for the specified court
 	 * the sql table start and end date seem to be mixed up
@@ -673,11 +703,12 @@ public class QueryFacade
 	}
 	
 	
-	public boolean customerReserved(String cid, String courtId) throws SQLException {
+	public boolean customerReserved(String cid, String courtId, String date) throws SQLException {
 		String query = "SELECT COUNT(*) " +
 					   "FROM Reserve r " +
 					   "WHERE r.cid = " + cid +
-					   "AND r.courtid = " + courtId;
+					   "AND r.courtid = " + courtId +
+					   "AND r.r_date = '" + date +"'";
 		
 		Statement s = conn.createStatement();
 		ResultSet rs = s.executeQuery(query);
