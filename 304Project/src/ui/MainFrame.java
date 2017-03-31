@@ -66,6 +66,7 @@ public class MainFrame extends JFrame implements ActionListener{
     private String custCredit;
     private String custAddress;
     private String custAge;
+    private boolean buttonClicked = false;
     
     private String conditionAge;
 
@@ -844,6 +845,10 @@ public class MainFrame extends JFrame implements ActionListener{
     //Customer book tennis court sub frame.
     private void bookTennisCourtSubFrame(){
     	reserveCourtId= "";
+    	reservationDate ="";
+        rStartTime = "";
+        rEndTime = "";
+    	
         final JFrame btcSubFrame = createSubFrame();
         final JPanel btcControlPanel = new JPanel();
         btcControlPanel.setLayout(new FlowLayout());
@@ -929,7 +934,6 @@ public class MainFrame extends JFrame implements ActionListener{
 			});
 			
 			reservationButton.addActionListener(new ActionListener(){
-				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if (reserveCourtId.equals("")){
@@ -937,6 +941,8 @@ public class MainFrame extends JFrame implements ActionListener{
 						reservationNull.showMessageDialog(mainFrame, "Select a Court before making a reservation.");
 						return;
 					}
+					if (!buttonClicked){
+						buttonClicked = true;
 					JPanel resDatePanel = new JPanel();
 					btcSubFrame.add(resDatePanel);
 					JTextField rDate = new JTextField("YYYY-MM-DD", 20);
@@ -953,59 +959,132 @@ public class MainFrame extends JFrame implements ActionListener{
 					resDatePanel.add(createReserve);
 					
 					SwingUtilities.updateComponentTreeUI(btcSubFrame);
-					
-					rDate.addActionListener(new ActionListener(){
+					rDate.addFocusListener(new FocusListener(){
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							// TODO Auto-generated method stub
+			        	public void focusLost(FocusEvent e) {
 							JTextField o = (JTextField)e.getSource();
 				    		reservationDate = o.getText();
 				    		System.out.println(reservationDate);
-							
-						}
+				    		String b = reservationDate.substring(0,4);
+				    	    String c = reservationDate.substring(5,7);
+				    	    String d = reservationDate.substring(8);
+				    	    try{
+				    	    	Integer.parseInt(b);
+				    	    	Integer.parseInt(c);
+				    	    	Integer.parseInt(d);
+				    	    	if(reservationDate.length() != 10 || reservationDate.indexOf("-") != 4 ||reservationDate.charAt(7) != ('-')){
+					    			JOptionPane typeChecking = new JOptionPane();
+			            			typeChecking.showMessageDialog(btcSubFrame, "Date should be in the format of YYYY-MM-DD");
+			            			reservationDate = "";
+			            			//resInfo
+					    		}
+				    	    }catch(Exception numExc){
+				    	    	JOptionPane typeChecking = new JOptionPane();
+		            			typeChecking.showMessageDialog(btcSubFrame, "Date should be in the format of YYYY-MM-DD");
+		            			reservationDate = "";
+		            			return;
+				    	    }
+				    		
+			            }
+			        	 @Override
+			             public void focusGained(FocusEvent e) {
+			                 // 
+			             }
 						
 					});
 					
-					start.addActionListener(new ActionListener(){
+					start.addFocusListener(new FocusListener(){
 						@Override
-						public void actionPerformed(ActionEvent e) {			
+			        	public void focusLost(FocusEvent e) {
 							JTextField o = (JTextField)e.getSource();
 				    		rStartTime = o.getText();
+				    		String a = rStartTime.substring(0, 2);
+				    		String b = rStartTime.substring(3);
+				    		try{
+				    			Integer.parseInt(a);
+				    			Integer.parseInt(b);
+				    			if(rStartTime.length() != 5 || rStartTime.charAt(2) != ':'){
+					    			JOptionPane typeChecking = new JOptionPane();
+			            			typeChecking.showMessageDialog(btcSubFrame, "Start Time should be in the format of HH:MM");
+			            			rStartTime = "";
+			            			//resInfo
+					    		}
+				    		}catch(Exception numExc){
+				    			JOptionPane typeChecking = new JOptionPane();
+		            			typeChecking.showMessageDialog(btcSubFrame, "Start Time should be in the format of HH:MM");
+		            			rStartTime = "";
+		            			return;
+				    		}
 				    		System.out.println(rStartTime);
-						}
+				    		
+			            }
+			        	 @Override
+			             public void focusGained(FocusEvent e) {
+			             }
+						
 					});
 					
-					end.addActionListener(new ActionListener(){
-
+					end.addFocusListener(new FocusListener(){
 						@Override
-						public void actionPerformed(ActionEvent e) {
+			        	public void focusLost(FocusEvent e) {
 							JTextField o = (JTextField)e.getSource();
 				    		rEndTime = o.getText();
 				    		System.out.println(rEndTime);
-						}
+				    		String a = rEndTime.substring(0, 2);
+				    		String b = rEndTime.substring(3);
+				    		try{
+				    			Integer.parseInt(a);
+				    			Integer.parseInt(b);
+				    			if(rEndTime.length() != 5 || rEndTime.charAt(2) != ':'){
+					    			JOptionPane typeChecking = new JOptionPane();
+			            			typeChecking.showMessageDialog(btcSubFrame, "End Time should be in the format of HH:MM");
+			            			rEndTime = "";
+			            			//resInfo
+					    		}
+				    		}catch(Exception numExc){
+				    			JOptionPane typeChecking = new JOptionPane();
+		            			typeChecking.showMessageDialog(btcSubFrame, "End Time should be in the format of HH:MM");
+		            			rEndTime = "";
+		            			return;
+				    		}
+				    		
+			            }
+			        	 @Override
+			             public void focusGained(FocusEvent e) {
+			             }
+						
 					});
 					
 					createReserve.addActionListener(new ActionListener(){
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							try {
-								boolean createdReservation = q.createReservation(customer.getCid(), reserveCourtId, reservationDate, rStartTime, rEndTime);
-								if (createdReservation) {
-									System.out.println("Success!");
-									btcSubFrame.setVisible(false);
-									btcSubFrame.dispose();
-									bookTennisCourtSubFrame();
-								} else{
-									System.out.println("Fail!");
+								if (reserveCourtId != "" && reservationDate != "" && rStartTime != "" && rEndTime != "") {
+									boolean createdReservation = q.createReservation(customer.getCid(), reserveCourtId, reservationDate, rStartTime, rEndTime);
+									if (createdReservation) {
+										System.out.println("Success!");
+										btcSubFrame.setVisible(false);
+										btcSubFrame.dispose();
+										bookTennisCourtSubFrame();
+									} else{
+										System.out.println("Fail!");
+									}
+								}else {
+									JOptionPane typeChecking = new JOptionPane();
+			            			typeChecking.showMessageDialog(btcSubFrame, "Fill out the date and time properly.");
 								}
 								return;
 							} catch (SQLException e1) {
+								JOptionPane typeChecking = new JOptionPane();
+		            			typeChecking.showMessageDialog(btcSubFrame, "Court " +reserveCourtId + " is already booked during that time.");
+		            			 SwingUtilities.updateComponentTreeUI(btcSubFrame);
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
 							
 						}
 					});
+				}
 				}
 			});
 			
