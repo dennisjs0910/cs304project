@@ -1134,8 +1134,6 @@ public class MainFrame extends JFrame implements ActionListener{
 				        	cancelCourtId = reservedTable.getValueAt(reservedTable.getSelectedRow(), 0).toString();
 				        	cancelDate = reservedTable.getValueAt(reservedTable.getSelectedRow(), 3).toString();
 				        	cancelStartTime = reservedTable.getValueAt(reservedTable.getSelectedRow(), 4).toString();
-				        	System.out.println("CANCELLLLL "+cancelDate);
-				        	System.out.println(cancelStartTime);
 				        }
 				    });
 					
@@ -1145,6 +1143,9 @@ public class MainFrame extends JFrame implements ActionListener{
 						public void actionPerformed(ActionEvent e) {
 							try {
 								q.deleteReservation(customer.getCid(), cancelCourtId,cancelDate,cancelStartTime);
+								cancelCourtId = "";
+						    	cancelDate = "";
+						    	cancelStartTime = "";
 								btcSubFrame.setVisible(false);
 								btcSubFrame.dispose();
 								bookTennisCourtSubFrame();
